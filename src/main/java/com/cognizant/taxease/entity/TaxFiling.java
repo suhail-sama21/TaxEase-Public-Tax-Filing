@@ -7,53 +7,53 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.*;
 
 @Entity
-@Table(name = "TaxFiling")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "tax_filing",
+        indexes = { @Index(name = "idx_filing_taxpayer", columnList = "taxpayer_id") })
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class TaxFiling {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "FilingID")
-    private Integer filingId;
+    @Column(name = "filing_id")
+    private Long id;
 
-    @Column(name = "TaxpayerID", nullable = false)
-    private Integer taxpayerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "taxpayer_id", nullable = false)
+    private Taxpayer taxpayer;
 
-    @Column(name = "Period", nullable = false, length = 20)
-    private String period; // e.g., FY2025-26 or 2026Q1
+    @Column(name = "period", nullable = false, length = 20)
+    private String period; // FY2025-26 or 2026Q1
 
-    @Column(name = "AmountDeclared", nullable = false, precision = 14, scale = 2)
+    @Column(name = "amount_declared", nullable = false, precision = 14, scale = 2)
     private BigDecimal amountDeclared;
 
-//    @Column(name = "SubmittedDate")
-//    private LocalDateTime submittedDate;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status", nullable = false)
+    @Column(name = "status", nullable = false, length = 30)
     private StatusBasic status = StatusBasic.Pending;
 
-    // NEW: Officer who handled/approved/reviewed this filing
-    @Column(name = "OfficerID")
-    private Integer officerId; // FK -> User.UserID (role should be Officer)
-//
-//    @Column(name = "CreatedBy")
-//    private Integer createdBy;
-//
-//    @Column(name = "UpdatedBy")
-//    private Integer updatedBy;
+    // Officer (User with role OFFICER) who touched this filing
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "officer_id")
+    private User officer;
 
     @CreationTimestamp
-    @Column(name = "SubmittedDate", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "submitted_date", nullable = false, updatable = false)
+    private Instant submittedDate;
 
     @UpdateTimestamp
-    @Column(name = "UpdatedAt", nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @OneToMany(mappedBy = "filing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "filing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FilingDocument> filingDocuments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "filing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ComplianceRecord> complianceRecords = new ArrayList<>();
 }

@@ -2,24 +2,43 @@ package com.cognizant.taxease.entity;
 
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Entity
+@Table(name = "audit_case",
+        indexes = { @Index(name = "idx_audit_officer", columnList = "officer_id") })
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Audit {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int AuditId;
-    //relationship
-    @JoinColumn(name = "OfficerId", nullable = false)
-    private User user;
-    private String Scope;
-    private String Findings;
-    @CreationTimestamp
-    @Column(nullable = false,updatable = false)
-    private Instant TimeStamp;
-    private StatusBasic Status;
+    @Column(name = "audit_id")
+    private Long id;
 
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "officer_id", nullable = false)
+    private User officer;
+
+    @Column(name = "scope", length = 200)
+    private String scope;
+
+    @Lob
+    @Column(name = "findings")
+    private String findings;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 30)
+    private StatusBasic status;
 }

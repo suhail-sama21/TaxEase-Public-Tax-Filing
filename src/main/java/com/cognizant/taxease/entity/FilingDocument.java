@@ -1,37 +1,35 @@
 package com.cognizant.taxease.entity;
 
-import ch.qos.logback.classic.pattern.LineOfCallerConverter;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Entity
+@Table(name = "filing_document")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class FilingDocument {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int DocumentId;
+    @Column(name = "document_id")
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn()
-    private TaxFiling FilingId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "filing_id", nullable = false)
+    private TaxFiling filing;
 
-    //DocType
-
-    private String FileUrl;
-
-    @CreationTimestamp
-    @Column(updatable = false)
-    private Instant UploadedDate;
-
-    //verification enum
-
-
-    private Instant CreatedAt;
+    // Add enums when ready: docType, verificationStatus
+    @Column(name = "file_url", nullable = false)
+    private String fileUrl;
 
     @CreationTimestamp
-    @Column(updatable = false)
-    private Instant UpdatedAt;
+    @Column(name = "uploaded_date", updatable = false, nullable = false)
+    private Instant uploadedDate;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

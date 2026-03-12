@@ -5,11 +5,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ComplianceRecord")
+@Table(name = "compliance_record")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,63 +19,50 @@ public class ComplianceRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ComplianceID")
-    private Integer complianceId;
+    @Column(name = "compliance_id")
+    private Long id;
 
-    // FK -> Taxpayer.TaxpayerID (required)
-    @Column(name = "TaxpayerID", nullable = false)
-    private Integer taxpayerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "taxpayer_id")
+    private Taxpayer taxpayer;
 
-    // FK -> TaxFiling.FilingID (optional; required when Type = Filing)
-    @Column(name = "FilingID")
-    private Integer filingId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "filing_id")
+    private TaxFiling filing;
 
-    // ✅ NEW: FK -> Payment.PaymentID (optional; required when Type = Payment)
-    @Column(name = "PaymentID")
-    private Integer paymentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "Type", nullable = false)
+    @Column(name = "type", nullable = false, length = 20)
     private ComplianceType type; // Filing or Payment
 
-    @Column(name = "Result", nullable = false, length = 100)
+    @Column(name = "result", nullable = false, length = 100)
     private String result;
 
-    @Column(name = "Date")
-    private LocalDate date; // DEFAULT can be set at DB level if needed
+    @Column(name = "date")
+    private LocalDate date;
 
-    @Column(name = "Notes", columnDefinition = "text")
+    @Column(name = "notes", columnDefinition = "text")
     private String notes;
 
-    // Who created this compliance record (FK -> User.UserID)
-    @Column(name = "ComplianceOfficer")
-    private Integer createdBy;
-
     @CreationTimestamp
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
-    // --- Convenience helpers (optional) ---
-
-    /**
-     * Ensure only one of filingId/paymentId is set according to Type.
-     * Call from service layer before save, or add a Bean Validation group if you prefer.
-     */
     @PrePersist
     @PreUpdate
     private void validateTarget() {
         if (type == ComplianceType.Filing) {
-            if (filingId == null || paymentId != null) {
-                throw new IllegalStateException("For Type=Filing, FilingID must be set and PaymentID must be null.");
+            if (filing == null || payment != null) {
+                throw new IllegalStateException("For Type=Filing, filing must be set and payment must be null.");
             }
         } else if (type == ComplianceType.Payment) {
-            if (paymentId == null || filingId != null) {
-                throw new IllegalStateException("For Type=Payment, PaymentID must be set and FilingID must be null.");
+            if (payment == null || filing != null) {
+                throw new IllegalStateException("For Type=Payment, payment must be set and filing must be null.");
             }
         }
-        // if date not provided, set today's date
-        if (date == null) {
-            date = LocalDate.now();
-        }
+        if (date == null) date = LocalDate.now();
     }
 }
