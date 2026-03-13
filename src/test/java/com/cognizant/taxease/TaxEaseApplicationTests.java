@@ -18,14 +18,6 @@ import org.springframework.test.annotation.Rollback;
 
 @SpringBootTest
 class TaxEaseApplicationTests {
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TaxpayerRepository taxpayerRepository;
-
-    @Autowired
-    private TaxFilingRepository taxFilingRepository;
 
     @Test
     void contextLoads() {
