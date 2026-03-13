@@ -13,7 +13,6 @@ import java.util.*;
 @Table(name = "taxpayer")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Taxpayer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "taxpayer_id")
