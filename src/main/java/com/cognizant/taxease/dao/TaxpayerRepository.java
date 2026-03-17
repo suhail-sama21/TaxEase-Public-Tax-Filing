@@ -1,4 +1,4 @@
-package com.cognizant.taxease.repository;
+package com.cognizant.taxease.dao;
 
 import com.cognizant.taxease.entity.Taxpayer;
 import org.springframework.data.jpa.repository.JpaRepository;
