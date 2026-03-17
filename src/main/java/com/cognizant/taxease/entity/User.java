@@ -10,7 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "user",
+@Table(name = "users",
         indexes = {
                 @Index(name = "idx_user_email", columnList = "email", unique = true),
                 @Index(name = "idx_user_role_status", columnList = "role,status")
@@ -61,4 +61,5 @@ public class User {
     // Inverse side of 1:1 with Taxpayer
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Taxpayer taxpayer;
+
 }
