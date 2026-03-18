@@ -76,4 +76,22 @@ public class NotificationServiceImpl implements NotificationService {
                         .build()
         ).collect(Collectors.toList());
     }
+    @Override
+    @Transactional
+    public void sendNotificationToUser(Long userId, String message, NotificationCategory category) {
+        // 1. Verify the user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // 2. Build the new notification
+        Notification notification = Notification.builder()
+                .user(user)
+                .message(message)
+                .category(category != null ? category : NotificationCategory.SYSTEM_UPDATE)
+                .status(NotificationStatus.UNREAD)
+                .build();
+
+        // 3. Save it to the database
+        notificationRepository.save(notification);
+    }
 }

@@ -1,6 +1,7 @@
 package com.cognizant.taxease.controller;
 
 import com.cognizant.taxease.dto.BroadcastRequest;
+import com.cognizant.taxease.dto.DirectNotificationRequest;
 import com.cognizant.taxease.dto.NotificationResponse;
 import com.cognizant.taxease.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +35,15 @@ public class NotificationController {
     public ResponseEntity<List<NotificationResponse>> getUserNotifications(@PathVariable Long userId) {
         List<NotificationResponse> notifications = notificationService.getUserNotifications(userId);
         return ResponseEntity.ok(notifications);
+    }
+
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<String> sendDirectNotification(
+            @PathVariable Long userId,
+            @RequestBody DirectNotificationRequest request) {
+
+        notificationService.sendNotificationToUser(userId, request.getMessage(), request.getCategory());
+
+        return ResponseEntity.ok("Notification sent successfully to user " + userId);
     }
 }

@@ -26,4 +26,6 @@ public interface NotificationService {
     // NEW: Retrieve all notifications for a specific user
     List<NotificationResponse> getUserNotifications(Long userId);
 
+    void sendNotificationToUser(Long userId, String message, NotificationCategory category);
+
 }
