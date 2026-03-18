@@ -2,6 +2,7 @@ package com.cognizant.taxease.service.impl;
 
 import com.cognizant.taxease.dao.NotificationRepository;
 import com.cognizant.taxease.dao.UserRepository;
+import com.cognizant.taxease.dto.NotificationResponse;
 import com.cognizant.taxease.entity.Notification;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.NotificationCategory;
@@ -56,5 +57,23 @@ public class NotificationServiceImpl implements NotificationService {
         // 3. Update the status and save
         notification.setStatus(NotificationStatus.READ);
         notificationRepository.save(notification);
+    }
+
+    @Override
+    public List<NotificationResponse> getUserNotifications(Long userId) {
+        // 1. Fetch from DB
+        List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedDateDesc(userId);
+
+        // 2. Map to DTOs
+        return notifications.stream().map(notification ->
+                NotificationResponse.builder()
+                        .id(notification.getId())
+                        .message(notification.getMessage())
+                        .category(notification.getCategory())
+                        .status(notification.getStatus())
+                        .entityId(notification.getEntityId())
+                        .createdDate(notification.getCreatedDate())
+                        .build()
+        ).collect(Collectors.toList());
     }
 }

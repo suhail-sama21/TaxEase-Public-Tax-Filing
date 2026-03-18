@@ -1,10 +1,13 @@
 package com.cognizant.taxease.controller;
 
 import com.cognizant.taxease.dto.BroadcastRequest;
+import com.cognizant.taxease.dto.NotificationResponse;
 import com.cognizant.taxease.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -26,5 +29,10 @@ public class NotificationController {
 
         notificationService.markAsRead(notificationId, userId);
         return ResponseEntity.ok("Notification successfully marked as read.");
+    }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<NotificationResponse>> getUserNotifications(@PathVariable Long userId) {
+        List<NotificationResponse> notifications = notificationService.getUserNotifications(userId);
+        return ResponseEntity.ok(notifications);
     }
 }

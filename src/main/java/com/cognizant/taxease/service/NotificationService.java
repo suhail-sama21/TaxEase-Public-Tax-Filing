@@ -1,6 +1,9 @@
 package com.cognizant.taxease.service;
 
+import com.cognizant.taxease.dto.NotificationResponse;
 import com.cognizant.taxease.entity.entityEnum.NotificationCategory;
+
+import java.util.List;
 
 public interface NotificationService {
 
@@ -19,5 +22,8 @@ public interface NotificationService {
      * @param userId         The ID of the user requesting the update (for security).
      */
     void markAsRead(Long notificationId, Long userId);
+
+    // NEW: Retrieve all notifications for a specific user
+    List<NotificationResponse> getUserNotifications(Long userId);
 
 }
