@@ -9,6 +9,8 @@ import com.cognizant.taxease.entity.entityEnum.NotificationCategory;
 import com.cognizant.taxease.entity.entityEnum.NotificationStatus;
 import com.cognizant.taxease.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+
+    private  final ModelMapper modelMapper ;
 
     @Override
     @Transactional
@@ -59,23 +63,32 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
     }
 
-    @Override
-    public List<NotificationResponse> getUserNotifications(Long userId) {
-        // 1. Fetch from DB
-        List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedDateDesc(userId);
+//    @Override
+//    public List<NotificationResponse> getUserNotifications(Long userId) {
+//        // 1. Fetch from DB
+//        List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedDateDesc(userId);
+//
+//        // 2. Map to DTOs
+//        return notifications.stream().map(notification ->
+//                NotificationResponse.builder()
+//                        .id(notification.getId())
+//                        .message(notification.getMessage())
+//                        .category(notification.getCategory())
+//                        .status(notification.getStatus())
+//                        .entityId(notification.getEntityId())
+//                        .createdDate(notification.getCreatedDate())
+//                        .build()
+//        ).collect(Collectors.toList());
+//    }
+@Override
+public List<NotificationResponse> getUserNotifications(Long userId) {
+    List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedDateDesc(userId);
 
-        // 2. Map to DTOs
-        return notifications.stream().map(notification ->
-                NotificationResponse.builder()
-                        .id(notification.getId())
-                        .message(notification.getMessage())
-                        .category(notification.getCategory())
-                        .status(notification.getStatus())
-                        .entityId(notification.getEntityId())
-                        .createdDate(notification.getCreatedDate())
-                        .build()
-        ).collect(Collectors.toList());
-    }
+    // Replaced Stream with ModelMapper using TypeToken to map the entire list at once
+    java.lang.reflect.Type targetListType = new TypeToken<List<NotificationResponse>>() {}.getType();
+
+    return modelMapper.map(notifications, targetListType);
+}
     @Override
     @Transactional
     public void sendNotificationToUser(Long userId, String message, NotificationCategory category) {
