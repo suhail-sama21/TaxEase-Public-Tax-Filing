@@ -5,6 +5,7 @@ import com.cognizant.taxease.dto.CreateComplianceRequest;
 import com.cognizant.taxease.entity.ComplianceRecord;
 import com.cognizant.taxease.service.ComplianceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.cognizant.taxease.dto.UpdateComplianceRequest;
 
@@ -35,5 +36,15 @@ public class ComplianceController {
     @PutMapping("/{id}")
     public ComplianceResponse updateCompliance(@PathVariable Long id, @RequestBody UpdateComplianceRequest request) {
         return complianceService.updateCompliance(id, request);
+    }
+
+    @GetMapping("/taxpayer/{taxpayerId}")
+    public List<ComplianceResponse> getComplianceByTaxpayerId(@PathVariable Long taxpayerId){
+        return complianceService.getComplianceByTaxpayerId(taxpayerId);
+    }
+
+    @GetMapping("/result/{result}")
+    public ResponseEntity<List<ComplianceResponse>> getByResult(@PathVariable String result){
+        return ResponseEntity.ok(complianceService.getByResult(result));
     }
 }

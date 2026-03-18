@@ -3,5 +3,11 @@ package com.cognizant.taxease.dao;
 import com.cognizant.taxease.entity.ComplianceRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ComplianceRecordRepository extends JpaRepository<ComplianceRecord, Long> {
+    List<ComplianceRecord> findByTaxpayer_Id(Long taxpayerId) ;
+
+    List<ComplianceRecord> findByResultIgnoreCase(String result);
+
 }

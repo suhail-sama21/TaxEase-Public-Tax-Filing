@@ -16,4 +16,8 @@ public interface ComplianceService {
     ComplianceResponse getComplianceById(Long id);
 
     ComplianceResponse updateCompliance(Long id, UpdateComplianceRequest request);
+
+    List<ComplianceResponse>getComplianceByTaxpayerId(Long taxpayerId);
+
+    List<ComplianceResponse> getByResult(String result);
 }

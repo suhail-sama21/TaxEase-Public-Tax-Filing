@@ -130,4 +130,19 @@ public class ComplianceServiceImpl implements ComplianceService {
         return mapToResponse(updatedRecord);
     }
 
+    @Override
+    public List<ComplianceResponse> getComplianceByTaxpayerId(Long taxpayerId) {
+        return complianceRecordRepository.findByTaxpayer_Id(taxpayerId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+
+    public List<ComplianceResponse> getByResult(String result){
+        return complianceRecordRepository.findByResultIgnoreCase(result)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 }
