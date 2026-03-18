@@ -1,4 +1,4 @@
-package com.cognizant.taxease.service;
+package com.cognizant.taxease.service.impl;
 
 import com.cognizant.taxease.config.JwtUtil;
 import com.cognizant.taxease.dto.TaxpayerRegistrationRequest;

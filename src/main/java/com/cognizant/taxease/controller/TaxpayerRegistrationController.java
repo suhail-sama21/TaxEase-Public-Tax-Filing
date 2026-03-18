@@ -4,7 +4,7 @@ import com.cognizant.taxease.dto.TaxpayerRegistrationRequest;
 import com.cognizant.taxease.dto.TaxpayerRegistrationResponse;
 import com.cognizant.taxease.exception.EmailAlreadyExistsException;
 import com.cognizant.taxease.exception.TaxpayerIdGenerationException;
-import com.cognizant.taxease.service.TaxpayerRegistrationService;
+import com.cognizant.taxease.service.impl.TaxpayerRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
