@@ -40,4 +40,21 @@ public class NotificationServiceImpl implements NotificationService {
         // Save all notifications to the database in one batch
         notificationRepository.saveAll(notifications);
     }
+
+    @Override
+    @Transactional
+    public void markAsRead(Long notificationId, Long userId) {
+        // 1. Fetch the notification, ensuring it belongs to the user
+        Notification notification = notificationRepository.findByIdAndUserId(notificationId, userId)
+                .orElseThrow(() -> new RuntimeException("Notification not found or you do not have permission to access it."));
+
+        // 2. Check if it is already read to avoid unnecessary database updates
+        if (notification.getStatus() == NotificationStatus.READ) {
+            return;
+        }
+
+        // 3. Update the status and save
+        notification.setStatus(NotificationStatus.READ);
+        notificationRepository.save(notification);
+    }
 }

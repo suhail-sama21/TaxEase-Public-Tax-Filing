@@ -18,4 +18,13 @@ public class NotificationController {
         notificationService.broadcastNotification(request.getMessage(), request.getCategory());
         return ResponseEntity.ok("Broadcast notification sent successfully to all users.");
     }
+
+    @PutMapping("/{notificationId}/read")
+    public ResponseEntity<String> markNotificationAsRead(
+            @PathVariable Long notificationId,
+            @RequestParam Long userId) {
+
+        notificationService.markAsRead(notificationId, userId);
+        return ResponseEntity.ok("Notification successfully marked as read.");
+    }
 }
