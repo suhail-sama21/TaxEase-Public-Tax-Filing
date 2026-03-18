@@ -1,4 +1,4 @@
-package com.cognizant.taxease.repository;
+package com.cognizant.taxease.dao;
 
 import com.cognizant.taxease.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    boolean existsByEmail(String email);
     Optional<User> findByEmail(String email);
 }

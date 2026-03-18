@@ -6,15 +6,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
 
 @Entity
-@Table(name = "user",
+@Table(name = "users",
         indexes = {
                 @Index(name = "idx_user_email", columnList = "email", unique = true),
                 @Index(name = "idx_user_role_status", columnList = "role,status")
@@ -24,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,21 +61,5 @@ public class User implements UserDetails {
     // Inverse side of 1:1 with Taxpayer
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Taxpayer taxpayer;
-
-
-    @Override
-    public String getUsername() {
-        return this.email; // LOGIN USING EMAIL
-    }
-
-    @Override
-    public String getPassword() {
-        return this.passwordHash;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> "ROLE_" + role.name());
-    }
 
 }
