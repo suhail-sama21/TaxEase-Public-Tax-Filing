@@ -4,10 +4,15 @@ import com.cognizant.taxease.entity.Payment;
 import com.cognizant.taxease.entity.entityEnum.PaymentMethod;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import java.math.BigDecimal;
 
+@Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
+    // Fulfills TAXFR-11: Get payments for a specific taxpayer
+    List<Payment> findByFiling_Taxpayer_Id(Long taxpayerId);
     long countByStatus(StatusBasic status);
     long countByStatusAndMethod(StatusBasic status, PaymentMethod method);
     long countByMethod(PaymentMethod method);

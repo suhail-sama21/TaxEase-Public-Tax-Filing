@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import static com.cognizant.taxease.entity.entityEnum.UserRole.Officer;
+import static com.cognizant.taxease.entity.entityEnum.UserRole.OFFICER;
 
 @Service
 @RequiredArgsConstructor
