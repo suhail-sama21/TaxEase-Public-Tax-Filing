@@ -32,9 +32,10 @@ public class WebSecurityConfig {
                                     .requestMatchers("/api/taxpayer/**").hasRole("TAXPAYER")
                                     .requestMatchers("/api/compliance/**").hasRole("COMPLIANCE")
                                     .requestMatchers("/api/documents/**").hasRole("TAXPAYER")
-                                    .requestMatchers("/api/filings").hasAnyRole("MANAGER","TAXPAYER")
-                                    .requestMatchers("/api/report/**").hasRole("ADMIN")
+                                    .requestMatchers("/api/filings/**").hasAnyRole("MANAGER","TAXPAYER")
+                                    .requestMatchers("/api/report/**").hasAnyRole("ADMIN")
                                     .requestMatchers("/api/payments/**").hasRole("TAXPAYER")
+                                    .requestMatchers("/api/notification/**").hasRole("TAXPAYER")
                                 .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
             return httpSecurity.build();

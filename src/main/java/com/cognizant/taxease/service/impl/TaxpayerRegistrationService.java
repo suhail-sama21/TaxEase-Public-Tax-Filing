@@ -41,7 +41,7 @@ public class TaxpayerRegistrationService {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .role(UserRole.Taxpayer)
+                .role(UserRole.TAXPAYER)
                 .status(StatusBasic.Active)
                 .build();
 
