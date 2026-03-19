@@ -1,4 +1,4 @@
-package com.cognizant.taxease.service.impl;
+package com.cognizant.taxease.service;
 
 import com.cognizant.taxease.dto.TaxFilingRequestDTO;
 import com.cognizant.taxease.dto.TaxFilingResponseDTO;

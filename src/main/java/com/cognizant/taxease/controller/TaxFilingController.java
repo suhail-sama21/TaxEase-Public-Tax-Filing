@@ -2,7 +2,7 @@ package com.cognizant.taxease.controller;
 
 import com.cognizant.taxease.dto.TaxFilingRequestDTO;
 import com.cognizant.taxease.dto.TaxFilingResponseDTO;
-import com.cognizant.taxease.service.impl.TaxFilingService;
+import com.cognizant.taxease.service.TaxFilingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
