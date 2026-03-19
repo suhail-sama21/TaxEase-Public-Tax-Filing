@@ -2,35 +2,32 @@ package com.cognizant.taxease.controller;
 
 import com.cognizant.taxease.dto.LoginRequestDto;
 import com.cognizant.taxease.dto.LoginResponseDto;
-import com.cognizant.taxease.dto.SignUpRequestDto;
-import com.cognizant.taxease.dto.SignUpResponseDto;
+import com.cognizant.taxease.dto.TaxpayerRegistrationRequestDto;
+import com.cognizant.taxease.dto.TaxpayerRegistrationResponseDto;
 import com.cognizant.taxease.service.AuthService;
+import com.cognizant.taxease.service.impl.TaxpayerRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final TaxpayerRegistrationService registrationService;
     private final AuthService authService;
-    @PostMapping("/signup")
-    public ResponseEntity<SignUpResponseDto> signUp(@RequestBody SignUpRequestDto dto) {
-        SignUpResponseDto response = authService.signUp(dto);
-        return ResponseEntity.ok(response);
-    }
 
+    @PostMapping("/register")
+    public ResponseEntity<TaxpayerRegistrationResponseDto> register(@RequestBody TaxpayerRegistrationRequestDto request) {
+
+        return ResponseEntity.ok(registrationService.registerTaxpayer(request));
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto) {
-        LoginResponseDto response = authService.login(dto);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
+        return ResponseEntity.ok(authService.login(request));
     }
-
-    @GetMapping("/taxpayer/register")
-    public String register(){
-        return "It is taxpayer";
-    }
-
 }

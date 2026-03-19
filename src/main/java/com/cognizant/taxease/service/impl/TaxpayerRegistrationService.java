@@ -1,8 +1,7 @@
 package com.cognizant.taxease.service.impl;
 
-import com.cognizant.taxease.config.JwtUtil;
-import com.cognizant.taxease.dto.TaxpayerRegistrationRequest;
-import com.cognizant.taxease.dto.TaxpayerRegistrationResponse;
+import com.cognizant.taxease.dto.TaxpayerRegistrationRequestDto;
+import com.cognizant.taxease.dto.TaxpayerRegistrationResponseDto;
 import com.cognizant.taxease.entity.Taxpayer;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
@@ -25,10 +24,9 @@ public class TaxpayerRegistrationService {
     private final UserRepository userRepository;
     private final TaxpayerRepository taxpayerRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
 
     @Transactional
-    public TaxpayerRegistrationResponse registerTaxpayer(TaxpayerRegistrationRequest request) {
+    public TaxpayerRegistrationResponseDto registerTaxpayer(TaxpayerRegistrationRequestDto request) {
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException("Account already exists for this email");
@@ -59,13 +57,9 @@ public class TaxpayerRegistrationService {
 
         taxpayerRepository.save(taxpayer);
 
-        // Generate JWT token
-        String jwtToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
-
-        return TaxpayerRegistrationResponse.builder()
+        return TaxpayerRegistrationResponseDto.builder()
                 .taxpayerIdNumber(taxpayerIdNumber)
                 .message("Taxpayer registered successfully")
-                .jwtToken(jwtToken)
                 .build();
     }
 

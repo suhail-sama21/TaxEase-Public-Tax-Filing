@@ -28,8 +28,13 @@ public class WebSecurityConfig {
                 .sessionManagement(sessionConfig->sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth->
                             auth
-                                .requestMatchers("/auth/**").permitAll()
-                                    .requestMatchers("/taxpayer/**").hasRole("TAXPAYER")
+                                .requestMatchers("/api/auth/**").permitAll()
+                                    .requestMatchers("/api/taxpayer/**").hasRole("TAXPAYER")
+                                    .requestMatchers("/api/compliance/**").hasRole("COMPLIANCE")
+                                    .requestMatchers("/api/documents/**").hasRole("TAXPAYER")
+                                    .requestMatchers("/api/filings").hasAnyRole("MANAGER","TAXPAYER")
+                                    .requestMatchers("/api/report/**").hasRole("ADMIN")
+                                    .requestMatchers("/api/payments/**").hasRole("TAXPAYER")
                                 .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
             return httpSecurity.build();

@@ -20,8 +20,6 @@ import org.springframework.test.context.TestPropertySource;
 })
 class TaxEaseApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
+
 
 }

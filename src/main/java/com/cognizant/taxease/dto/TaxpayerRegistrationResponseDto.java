@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaxpayerRegistrationResponse {
+public class TaxpayerRegistrationResponseDto {
     private String taxpayerIdNumber; // 11-digit ID
     private String message;
-    private String jwtToken;
 }

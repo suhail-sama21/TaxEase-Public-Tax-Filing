@@ -10,10 +10,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaxpayerRegistrationRequest {
+public class TaxpayerRegistrationRequestDto {
+
     private String name;
     private String email;
     private String phone;
     private String password;
-    private TaxpayerType taxpayerType; // Citizen or Business
+
+    private TaxpayerType taxpayerType;   // Citizen / Business
+    private String address;
+    private String contactInfo;
+
 }

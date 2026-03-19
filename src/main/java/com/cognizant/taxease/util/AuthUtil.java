@@ -16,11 +16,10 @@ public class AuthUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String generateToken(User user) {
+    public String generateToken(String email,String role) {
         return Jwts.builder()
-                .subject(user.getEmail())
-                .claim("role", user.getRole().name())
-                .claim("userId", user.getId())
+                .subject(email)
+                .claim("role",role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
@@ -37,5 +36,17 @@ public class AuthUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith((SecretKey)Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8))) // Use verifyWith for modern versions
+                    .build()
+                    .parseSignedClaims(token); // Use parseSignedClaims instead of parseClaimsJws
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
