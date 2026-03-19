@@ -24,8 +24,9 @@ public class TaxFilingController {
     }
 
     @GetMapping("/taxpayer/{taxpayerId}")
-    public ResponseEntity<List<TaxFilingResponseDTO>> getFilings(@PathVariable Long taxpayerId) {
-        return ResponseEntity.ok(taxFilingService.getFilingsByTaxpayer(taxpayerId));
+    public ResponseEntity<List<TaxFilingResponseDTO>> getHistory(@PathVariable Long taxpayerId) {
+        // Change 'getFilingsByTaxpayer' to 'getFilingHistory'
+        return ResponseEntity.ok(taxFilingService.getFilingHistory(taxpayerId));
     }
 
     @PutMapping("/{filingId}/status")
