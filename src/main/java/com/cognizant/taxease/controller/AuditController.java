@@ -25,7 +25,7 @@ public class AuditController {
     public ResponseEntity<AuditResponse> getAuditById(@PathVariable Long id) {
         return ResponseEntity.ok(auditService.getAuditById(id));
     }
-
+   /// coo
     @PutMapping("/{id}/close")
     public ResponseEntity<AuditResponse> closeAudit(@PathVariable Long id,
                                                     @RequestBody CloseAuditRequest request) {
