@@ -1,12 +1,12 @@
 package com.cognizant.taxease.controller;
 
+import com.cognizant.taxease.dto.PaymentRequest;
 import com.cognizant.taxease.entity.Payment;
 import com.cognizant.taxease.entity.entityEnum.PaymentMethod;
-import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import com.cognizant.taxease.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
+
 import java.util.List;
 
 @RestController
@@ -16,23 +16,31 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    // Endpoint for TAXFR-10: Make a payment
+    /**
+     * Endpoint for TAXFR-10: Make a payment
+     * Accepts a JSON body via the PaymentRequest DTO
+     */
     @PostMapping("/pay")
-    public Payment makePayment(
-            @RequestParam Long filingId,
-            @RequestParam PaymentMethod method,
-            @RequestParam BigDecimal amount,
-            @RequestParam StatusBasic status) {
-        return paymentService.makePayment(filingId, method, amount, status);
+    public Payment makePayment(@RequestBody PaymentRequest request) {
+        return paymentService.makePayment(
+                request.getFilingId(),
+                request.getMethod(),
+                request.getAmount(),
+                request.getStatus()
+        );
     }
 
-    // Endpoint for TAXFR-11: Get payment history
+    /**
+     * Endpoint for TAXFR-11: Get payment history
+     */
     @GetMapping("/history/{taxpayerId}")
     public List<Payment> getPaymentHistory(@PathVariable Long taxpayerId) {
         return paymentService.getPaymentsByTaxpayer(taxpayerId);
     }
 
-    // Endpoint for TAXFR-12: Retry a failed payment
+    /**
+     * Endpoint for TAXFR-12: Retry a failed payment
+     */
     @PostMapping("/retry/{oldPaymentId}")
     public Payment retryPayment(
             @PathVariable Long oldPaymentId,
