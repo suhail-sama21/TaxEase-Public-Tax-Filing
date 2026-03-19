@@ -27,7 +27,7 @@ public class DatabaseSeeder {
                         .email("johndoe@example.com")
                         .phone("1234567890")
                         .passwordHash("dummy_password_123")
-                        .role(UserRole.Taxpayer) // Add this! (Check your exact enum name for Role)
+                        .role(UserRole.TAXPAYER) // Add this! (Check your exact enum name for Role)
                         .status(StatusBasic.Active)// If your User entity requires a Role or Status enum, add them here!
                         .build();
 
