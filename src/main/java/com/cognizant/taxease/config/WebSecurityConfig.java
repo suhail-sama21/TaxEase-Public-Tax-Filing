@@ -22,23 +22,43 @@ public class WebSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf(csrfConfig->csrfConfig.disable())
-                .sessionManagement(sessionConfig->sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth->
-                            auth
-                                .requestMatchers("/api/auth/**").permitAll()
-                                    .requestMatchers("/api/taxpayer/**").hasRole("TAXPAYER")
-                                    .requestMatchers("/api/compliance/**").hasRole("COMPLIANCE")
-                                    .requestMatchers("/api/documents/**").hasRole("TAXPAYER")
-                                    .requestMatchers("/api/filings/**").hasAnyRole("MANAGER","TAXPAYER")
-                                    .requestMatchers("/api/report/**").hasAnyRole("ADMIN")
-                                    .requestMatchers("/api/payments/**").hasRole("TAXPAYER")
-                                    .requestMatchers("/api/notification/**").hasRole("TAXPAYER")
-                                .anyRequest().authenticated()
-                ).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-            return httpSecurity.build();
+                .csrf(csrfConfig -> csrfConfig.disable())
+                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // 1. Public Routes
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // 2. Tax Filings & Documents
+                        .requestMatchers("/api/filings/submit").hasRole("TAXPAYER")
+                        .requestMatchers("/api/filings/taxpayer/**").hasAnyRole("TAXPAYER", "OFFICER")
+                        .requestMatchers("/api/filings/*/status").hasRole("OFFICER")
+                        .requestMatchers("/api/documents/upload").hasRole("TAXPAYER")
+                        .requestMatchers("/api/documents/filing/**").hasAnyRole("TAXPAYER", "OFFICER")
+
+                        // 3. Payments & Revenue
+                        .requestMatchers("/api/payments/pay", "/api/payments/retry/**").hasRole("TAXPAYER")
+                        .requestMatchers("/api/payments/history/**").hasAnyRole("TAXPAYER", "OFFICER")
+
+                        // 4. Compliance & Audit
+                        .requestMatchers("/api/compliance/**").hasAnyRole("COMPLIANCE", "MANAGER", "ADMIN")
+                        .requestMatchers("/api/compliance/taxpayer/**").hasAnyRole("TAXPAYER", "COMPLIANCE")
+
+                        // 5. Reporting & Analytics
+                        .requestMatchers("/api/reports/payments/**", "/api/reports/revenue/**").hasAnyRole("MANAGER", "AUDITOR")
+                        .requestMatchers("/api/reports/audits/**").hasAnyRole("AUDITOR", "ADMIN")
+                        .requestMatchers("/api/reports/custom/download").hasAnyRole("ADMIN", "MANAGER")
+
+                        // 6. Notifications
+                        .requestMatchers("/api/notifications/broadcast").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/notifications/user/**").authenticated() // Logic handled in service for self vs officer
+
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return httpSecurity.build();
     }
 
     @Bean
