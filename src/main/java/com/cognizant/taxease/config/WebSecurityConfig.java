@@ -54,6 +54,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/notifications/broadcast").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/notifications/user/**").authenticated() // Logic handled in service for self vs officer
 
+                        // 7. Taxpayer Profile
+                        .requestMatchers("/api/taxpayers/**").hasRole("TAXPAYER")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
