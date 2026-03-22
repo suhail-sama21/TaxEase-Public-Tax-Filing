@@ -3,6 +3,7 @@ package com.cognizant.taxease.controller;
 import com.cognizant.taxease.dto.AuditResponse;
 import com.cognizant.taxease.dto.CloseAuditRequest;
 import com.cognizant.taxease.service.AuditService;
+import jakarta.validation.Valid; // Don't forget this import!
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,15 @@ public class AuditController {
     public ResponseEntity<AuditResponse> getAuditById(@PathVariable Long id) {
         return ResponseEntity.ok(auditService.getAuditById(id));
     }
-   /// coo
+
+    /**
+     * Closes an audit.
+     * Added @Valid to ensure 'findings' is not blank as per our DTO rules.
+     */
     @PutMapping("/{id}/close")
-    public ResponseEntity<AuditResponse> closeAudit(@PathVariable Long id,
-                                                    @RequestBody CloseAuditRequest request) {
+    public ResponseEntity<AuditResponse> closeAudit(
+            @PathVariable Long id,
+            @Valid @RequestBody CloseAuditRequest request) {
         return ResponseEntity.ok(auditService.closeAudit(id, request));
     }
 }
