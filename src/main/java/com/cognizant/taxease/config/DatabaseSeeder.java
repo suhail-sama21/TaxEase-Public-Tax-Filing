@@ -1,54 +1,89 @@
 package com.cognizant.taxease.config;
 
+import com.cognizant.taxease.dao.TaxpayerRepository;
+import com.cognizant.taxease.dao.UserRepository;
 import com.cognizant.taxease.entity.Taxpayer;
-import com.cognizant.taxease.entity.User; // Import your User entity
+import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import com.cognizant.taxease.entity.entityEnum.TaxpayerType;
-import com.cognizant.taxease.dao.TaxpayerRepository;
-import com.cognizant.taxease.dao.UserRepository; // You need this to save the user
-
 import com.cognizant.taxease.entity.entityEnum.UserRole;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Configuration
-public class DatabaseSeeder {
+@RequiredArgsConstructor
+public class DatabaseSeeder implements CommandLineRunner {
 
-    @Bean
-    CommandLineRunner initDatabase(UserRepository userRepository, TaxpayerRepository taxpayerRepository) {
-        return args -> {
-            // Only insert if the table is empty
-            if (taxpayerRepository.count() == 0) {
+    private final UserRepository userRepository;
+    private final TaxpayerRepository taxpayerRepository;
+    private final PasswordEncoder passwordEncoder;
 
-                // 1. MUST create a User first because Taxpayer requires it
-                User dummyUser = User.builder()
-                        .name("John Doe")
-                        .email("johndoe@example.com")
-                        .phone("1234567890")
-                        .passwordHash("dummy_password_123")
-                        .role(UserRole.Taxpayer) // Add this! (Check your exact enum name for Role)
-                        .status(StatusBasic.Active)// If your User entity requires a Role or Status enum, add them here!
-                        .build();
+    @Override
+    @Transactional
+    public void run(String... args) throws Exception {
+        // Check if data already exists to prevent duplicate key exceptions
+        if (userRepository.count() == 0) {
+            log.info("Starting Database Seeding...");
 
-                // Save the user to the database to generate its ID
-                userRepository.save(dummyUser);
+            try {
+                String commonPassword = passwordEncoder.encode("Password123");
 
-                // 2. Create the Taxpayer (without status) and attach the saved User
-                Taxpayer dummyTaxpayer = Taxpayer.builder()
-                        .user(dummyUser) // This links the mandatory 1:1 relationship
-                        .name("John Doe")
-                        .type(TaxpayerType.Citizen) // Make sure 'Citizen' matches your enum exactly
-                        .address("123 Tech Park, Bengaluru")
-                        .contactInfo("johndoe@example.com")
-                        // Status is completely removed!
-                        .build();
+                // 1. Create Internal Staff Users
+                createUser("System Admin", "admin@taxease.gov", UserRole.ADMINISTRATOR, commonPassword);
+                createUser("Officer Sarah", "officer@taxease.gov", UserRole.OFFICER, commonPassword);
+                createUser("Manager Mike", "manager@taxease.gov", UserRole.MANAGER, commonPassword);
+                createUser("Compliance Head", "compliance@taxease.gov", UserRole.COMPLIANCE, commonPassword);
+                createUser("Gov Auditor", "auditor@taxease.gov", UserRole.AUDITOR, commonPassword);
 
-                // Save the taxpayer
-                taxpayerRepository.save(dummyTaxpayer);
+                // 2. Create Taxpayers (Requires a User record + Taxpayer record)
 
-                System.out.println("✅ Dummy User and Taxpayer injected successfully! Taxpayer ID: " + dummyTaxpayer.getId());
+                // Citizen Taxpayer
+                User user1 = createUser("John Doe", "johndoe@example.com", UserRole.TAXPAYER, commonPassword);
+                createTaxpayer(user1, "John Doe", TaxpayerType.Citizen, "123 Tech Park, Bengaluru");
+
+                // Business Taxpayer
+                User user2 = createUser("Global Tech Corp", "billing@globaltech.com", UserRole.TAXPAYER, commonPassword);
+                createTaxpayer(user2, "Global Tech Corp", TaxpayerType.Business, "Plot 45, Hitech City, Hyderabad");
+
+                log.info("Database Seeding Completed Successfully!");
+                log.info("Test credentials: All accounts use password 'Password123'");
+
+            } catch (Exception e) {
+                log.error("Seeding failed due to an error: {}", e.getMessage());
+                throw e; // Rollback transaction
             }
-        };
+        } else {
+            log.info("Database already contains data. Skipping seeding process.");
+        }
+    }
+
+    private User createUser(String name, String email, UserRole role, String password) {
+        User user = User.builder()
+                .name(name)
+                .email(email)
+                .phone("9876543210")
+                .passwordHash(password)
+                .role(role)
+                .status(StatusBasic.Active)
+                .build();
+        // saveAndFlush ensures the ID is generated and available immediately
+        return userRepository.saveAndFlush(user);
+    }
+
+    private void createTaxpayer(User user, String name, TaxpayerType type, String address) {
+        Taxpayer taxpayer = Taxpayer.builder()
+                .user(user)
+                .name(name)
+                .type(type)
+                .address(address)
+                .contactInfo(user.getEmail())
+                .taxpayerIdNumber("TAX-" + System.currentTimeMillis() % 100000)
+                .build();
+        taxpayerRepository.saveAndFlush(taxpayer);
     }
 }
