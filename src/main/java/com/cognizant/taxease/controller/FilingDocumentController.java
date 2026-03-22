@@ -3,6 +3,7 @@ package com.cognizant.taxease.controller;
 import com.cognizant.taxease.dto.FilingDocumentRequestDTO;
 import com.cognizant.taxease.dto.FilingDocumentResponseDTO;
 import com.cognizant.taxease.service.FilingDocumentService;
+import jakarta.validation.Valid; // Required to activate DTO validation
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,13 @@ public class FilingDocumentController {
 
     private final FilingDocumentService documentService;
 
+    /**
+     * Uploads a document link for a specific filing.
+     * Added @Valid to ensure the RequestDTO meets all validation constraints.
+     */
     @PostMapping("/upload")
-    public ResponseEntity<FilingDocumentResponseDTO> uploadDocument(@RequestBody FilingDocumentRequestDTO dto) {
+    public ResponseEntity<FilingDocumentResponseDTO> uploadDocument(
+            @Valid @RequestBody FilingDocumentRequestDTO dto) {
         return new ResponseEntity<>(documentService.addDocument(dto), HttpStatus.CREATED);
     }
 
