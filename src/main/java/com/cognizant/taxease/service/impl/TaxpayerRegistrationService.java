@@ -53,6 +53,8 @@ public class TaxpayerRegistrationService {
                 .name(request.getName())
                 .type(request.getTaxpayerType())
                 .taxpayerIdNumber(taxpayerIdNumber)
+                .address(request.getAddress())
+                .contactInfo(request.getContactInfo())
                 .build();
 
         taxpayerRepository.save(taxpayer);

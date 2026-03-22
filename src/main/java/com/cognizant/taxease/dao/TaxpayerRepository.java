@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface TaxpayerRepository extends JpaRepository<Taxpayer, Long> {
     boolean existsByTaxpayerIdNumber(String taxpayerIdNumber);
     Optional<Taxpayer> findByTaxpayerIdNumber(String taxpayerIdNumber);
+    Optional<Taxpayer> findByUser(com.cognizant.taxease.entity.User user);
 }
