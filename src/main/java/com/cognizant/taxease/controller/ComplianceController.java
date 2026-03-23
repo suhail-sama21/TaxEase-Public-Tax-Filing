@@ -1,8 +1,8 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.ComplianceResponse;
-import com.cognizant.taxease.dto.CreateComplianceRequest;
-import com.cognizant.taxease.dto.UpdateComplianceRequest;
+import com.cognizant.taxease.dto.responsedto.ComplianceResponse;
+import com.cognizant.taxease.dto.requestdto.CreateComplianceRequest;
+import com.cognizant.taxease.dto.requestdto.UpdateComplianceRequest;
 import com.cognizant.taxease.service.ComplianceService;
 import jakarta.validation.Valid; // Required for validation enforcement
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.PaymentRequest;
+import com.cognizant.taxease.dto.requestdto.PaymentRequest;
 import com.cognizant.taxease.entity.Payment;
 import com.cognizant.taxease.entity.entityEnum.PaymentMethod;
 import com.cognizant.taxease.service.PaymentService;

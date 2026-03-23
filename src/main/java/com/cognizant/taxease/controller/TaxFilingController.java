@@ -1,7 +1,7 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.TaxFilingRequestDTO;
-import com.cognizant.taxease.dto.TaxFilingResponseDTO;
+import com.cognizant.taxease.dto.requestdto.TaxFilingRequestDTO;
+import com.cognizant.taxease.dto.responsedto.TaxFilingResponseDTO;
 import com.cognizant.taxease.service.TaxFilingService;
 import jakarta.validation.Valid; // Required for DTO validation
 import jakarta.validation.constraints.NotBlank; // For parameter validation

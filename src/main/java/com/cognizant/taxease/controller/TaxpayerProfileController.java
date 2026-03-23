@@ -1,6 +1,10 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.*;
+import com.cognizant.taxease.dto.requestdto.DocumentUpdateRequestDto;
+import com.cognizant.taxease.dto.requestdto.DocumentUploadRequestDto;
+import com.cognizant.taxease.dto.requestdto.UpdateTaxpayerProfileRequestDto;
+import com.cognizant.taxease.dto.responsedto.TaxpayerDocumentResponseDto;
+import com.cognizant.taxease.dto.responsedto.TaxpayerProfileResponseDto;
 import com.cognizant.taxease.service.TaxpayerProfileService;
 import jakarta.validation.Valid; // Required for validation enforcement
 import lombok.RequiredArgsConstructor;

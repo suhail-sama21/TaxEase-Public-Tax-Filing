@@ -1,8 +1,8 @@
 package com.cognizant.taxease.service;
 
-import com.cognizant.taxease.dto.TaxpayerDocumentResponseDto;
-import com.cognizant.taxease.dto.TaxpayerProfileResponseDto;
-import com.cognizant.taxease.dto.UpdateTaxpayerProfileRequestDto;
+import com.cognizant.taxease.dto.responsedto.TaxpayerDocumentResponseDto;
+import com.cognizant.taxease.dto.responsedto.TaxpayerProfileResponseDto;
+import com.cognizant.taxease.dto.requestdto.UpdateTaxpayerProfileRequestDto;
 import com.cognizant.taxease.entity.entityEnum.DocTypeTaxpayer;
 
 import java.util.List;

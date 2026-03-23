@@ -1,9 +1,9 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.LoginRequestDto;
-import com.cognizant.taxease.dto.LoginResponseDto;
-import com.cognizant.taxease.dto.TaxpayerRegistrationRequestDto;
-import com.cognizant.taxease.dto.TaxpayerRegistrationResponseDto;
+import com.cognizant.taxease.dto.requestdto.LoginRequestDto;
+import com.cognizant.taxease.dto.responsedto.LoginResponseDto;
+import com.cognizant.taxease.dto.requestdto.TaxpayerRegistrationRequestDto;
+import com.cognizant.taxease.dto.responsedto.TaxpayerRegistrationResponseDto;
 import com.cognizant.taxease.service.AuthService;
 import com.cognizant.taxease.service.impl.TaxpayerRegistrationService;
 import jakarta.validation.Valid; // Required for validation enforcement
