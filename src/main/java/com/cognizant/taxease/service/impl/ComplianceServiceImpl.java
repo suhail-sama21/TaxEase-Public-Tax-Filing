@@ -7,6 +7,7 @@ import com.cognizant.taxease.dto.UpdateComplianceRequest;
 import com.cognizant.taxease.entity.*;
 import com.cognizant.taxease.entity.entityEnum.ComplianceType;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.ComplianceService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class ComplianceServiceImpl implements ComplianceService {
     private final TaxpayerRepository taxpayerRepository;
     private final TaxFilingRepository taxFilingRepository;
     private final PaymentRepository paymentRepository;
+    private final AuditLogService auditLogService;
 
     private final AuditRepository auditRepository;
     private final UserRepository userRepository;
@@ -75,6 +77,7 @@ public class ComplianceServiceImpl implements ComplianceService {
 
         // Save the record to the database
         ComplianceRecord savedRecord = complianceRecordRepository.save(record);
+        auditLogService.record("COMPLIANCE_CREATE", "compliance_records/" + savedRecord.getId());
         // Map the saved entity to your DTO to prevent infinite JSON recursion
         return mapToResponse(savedRecord);
 
@@ -97,6 +100,7 @@ public class ComplianceServiceImpl implements ComplianceService {
     public ComplianceResponse getComplianceById(Long id) {
         ComplianceRecord record = complianceRecordRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Compliance not found"));
+        auditLogService.record("COMPLIANCE_VIEW", "compliance_records/" + id);
         return mapToResponse(record);
     }
 
@@ -122,7 +126,8 @@ public class ComplianceServiceImpl implements ComplianceService {
                         .status(StatusBasic.Active)
                         .build();
 
-                auditRepository.save(audit);
+                Audit updatedRecord=auditRepository.save(audit);
+                auditLogService.record("COMPLIANCE_UPDATE", "compliance_records/" + updatedRecord.getId());
             }
         }
 
@@ -136,6 +141,7 @@ public class ComplianceServiceImpl implements ComplianceService {
 
     @Override
     public List<ComplianceResponse> getComplianceByTaxpayerId(Long taxpayerId) {
+        auditLogService.record("COMPLIANCE_LIST_VIEW", "taxpayer/" + taxpayerId + "/compliance");
         return complianceRecordRepository.findByTaxpayer_Id(taxpayerId)
                 .stream()
                 .map(this::mapToResponse)

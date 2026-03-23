@@ -9,6 +9,7 @@ import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import com.cognizant.taxease.dao.TaxFilingRepository;
 import com.cognizant.taxease.dao.TaxpayerRepository;
 import com.cognizant.taxease.dao.UserRepository;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.TaxFilingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class TaxFilingServiceImpl implements TaxFilingService {
     private final TaxFilingRepository taxFilingRepository;
     private final TaxpayerRepository taxpayerRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -39,12 +41,14 @@ public class TaxFilingServiceImpl implements TaxFilingService {
                 .build();
 
         TaxFiling savedFiling = taxFilingRepository.save(filing);
+        auditLogService.record("FILING_SUBMIT", "tax_filings/" + savedFiling.getId());
         return mapToDTO(savedFiling);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TaxFilingResponseDTO> getFilingHistory(Long taxpayerId) {
+        auditLogService.record("FILING_HISTORY_VIEW", "taxpayer/" + taxpayerId + "/filings");
         return taxFilingRepository.findByTaxpayerId(taxpayerId).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -63,8 +67,9 @@ public class TaxFilingServiceImpl implements TaxFilingService {
                     .orElseThrow(() -> new RuntimeException("Officer not found"));
             filing.setOfficer(officer);
         }
-
-        return mapToDTO(taxFilingRepository.save(filing));
+        TaxFiling updated = taxFilingRepository.save(filing);
+        auditLogService.record("FILING_STATUS_UPDATE", "tax_filings/" + updated.getId());
+        return mapToDTO(updated);
     }
 
     private TaxFilingResponseDTO mapToDTO(TaxFiling filing) {

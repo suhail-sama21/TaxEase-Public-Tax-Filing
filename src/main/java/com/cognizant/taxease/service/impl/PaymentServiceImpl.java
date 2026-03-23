@@ -8,6 +8,7 @@ import com.cognizant.taxease.entity.RevenueRecord;
 import com.cognizant.taxease.entity.TaxFiling;
 import com.cognizant.taxease.entity.entityEnum.PaymentMethod;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private RevenueRecordRepository revenueRecordRepository;
+
+    @Autowired
+    private AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -51,7 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .amount(amount)
                     .status(StatusBasic.Completed)
                     .build();
-            revenueRecordRepository.save(revenueRecord);
+            auditLogService.record("PAYMENT_CREATE", "payments/" + payment.getId());
         }
 
         return payment;
@@ -75,6 +79,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         // Creates a new record for the retry; the old one remains Failed
+        auditLogService.record("PAYMENT_RETRY", "payments/" + oldPaymentId);
         return makePayment(
                 oldPayment.getFiling().getId(),
                 newMethod,
