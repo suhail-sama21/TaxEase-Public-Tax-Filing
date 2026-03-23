@@ -2,11 +2,12 @@ package com.cognizant.taxease.service.impl;
 
 import com.cognizant.taxease.dao.NotificationRepository;
 import com.cognizant.taxease.dao.UserRepository;
-import com.cognizant.taxease.dto.NotificationResponse;
+import com.cognizant.taxease.dto.responsedto.NotificationResponse;
 import com.cognizant.taxease.entity.Notification;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.NotificationCategory;
 import com.cognizant.taxease.entity.entityEnum.NotificationStatus;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     private  final ModelMapper modelMapper ;
 
@@ -44,6 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         // Save all notifications to the database in one batch
         notificationRepository.saveAll(notifications);
+        auditLogService.record("NOTIFICATION_BROADCAST", "notifications/bulk");
     }
 
     @Override
@@ -61,6 +64,7 @@ public class NotificationServiceImpl implements NotificationService {
         // 3. Update the status and save
         notification.setStatus(NotificationStatus.READ);
         notificationRepository.save(notification);
+        auditLogService.record("NOTIFICATION_SEND", "notifications/user/" + userId);
     }
 
 //    @Override

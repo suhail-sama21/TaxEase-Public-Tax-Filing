@@ -1,7 +1,7 @@
 package com.cognizant.taxease.service.impl;
 
-import com.cognizant.taxease.dto.TaxpayerRegistrationRequestDto;
-import com.cognizant.taxease.dto.TaxpayerRegistrationResponseDto;
+import com.cognizant.taxease.dto.requestdto.TaxpayerRegistrationRequestDto;
+import com.cognizant.taxease.dto.responsedto.TaxpayerRegistrationResponseDto;
 import com.cognizant.taxease.entity.Taxpayer;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
@@ -10,6 +10,7 @@ import com.cognizant.taxease.exception.EmailAlreadyExistsException;
 import com.cognizant.taxease.exception.TaxpayerIdGenerationException;
 import com.cognizant.taxease.dao.TaxpayerRepository;
 import com.cognizant.taxease.dao.UserRepository;
+import com.cognizant.taxease.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class TaxpayerRegistrationService {
     private final UserRepository userRepository;
     private final TaxpayerRepository taxpayerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public TaxpayerRegistrationResponseDto registerTaxpayer(TaxpayerRegistrationRequestDto request) {
@@ -58,6 +60,7 @@ public class TaxpayerRegistrationService {
                 .build();
 
         taxpayerRepository.save(taxpayer);
+        auditLogService.recordRegistration(user,"TAXPAYER_REGISTER", "taxpayers/" + taxpayerIdNumber);
 
         return TaxpayerRegistrationResponseDto.builder()
                 .taxpayerIdNumber(taxpayerIdNumber)

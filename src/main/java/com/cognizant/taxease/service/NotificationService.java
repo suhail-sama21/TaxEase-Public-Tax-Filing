@@ -1,6 +1,6 @@
 package com.cognizant.taxease.service;
 
-import com.cognizant.taxease.dto.NotificationResponse;
+import com.cognizant.taxease.dto.responsedto.NotificationResponse;
 import com.cognizant.taxease.entity.entityEnum.NotificationCategory;
 
 import java.util.List;

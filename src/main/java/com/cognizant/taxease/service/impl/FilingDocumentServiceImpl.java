@@ -1,11 +1,12 @@
 package com.cognizant.taxease.service.impl;
 
-import com.cognizant.taxease.dto.FilingDocumentRequestDTO;
-import com.cognizant.taxease.dto.FilingDocumentResponseDTO;
+import com.cognizant.taxease.dto.requestdto.FilingDocumentRequestDTO;
+import com.cognizant.taxease.dto.responsedto.FilingDocumentResponseDTO;
 import com.cognizant.taxease.entity.FilingDocument;
 import com.cognizant.taxease.entity.TaxFiling;
 import com.cognizant.taxease.dao.FilingDocumentRepository;
 import com.cognizant.taxease.dao.TaxFilingRepository;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.FilingDocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class FilingDocumentServiceImpl implements FilingDocumentService {
 
     private final FilingDocumentRepository documentRepository;
     private final TaxFilingRepository taxFilingRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -34,6 +36,7 @@ public class FilingDocumentServiceImpl implements FilingDocumentService {
 
         FilingDocument savedDoc = documentRepository.save(document);
 
+        auditLogService.record("DOCUMENT_UPLOAD", "filing_documents/" + savedDoc.getId());
         return FilingDocumentResponseDTO.builder()
                 .id(savedDoc.getId())
                 .filingId(savedDoc.getFiling().getId())
@@ -45,6 +48,7 @@ public class FilingDocumentServiceImpl implements FilingDocumentService {
     @Override
     @Transactional(readOnly = true)
     public List<FilingDocumentResponseDTO> getDocumentsByFiling(Long filingId) {
+        auditLogService.record("DOCUMENT_LIST_VIEW", "filings/" + filingId + "/documents");
         return documentRepository.findByFilingId(filingId).stream()
                 .map(doc -> FilingDocumentResponseDTO.builder()
                         .id(doc.getId())

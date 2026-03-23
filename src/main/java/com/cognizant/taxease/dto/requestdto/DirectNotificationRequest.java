@@ -1,4 +1,4 @@
-package com.cognizant.taxease.dto;
+package com.cognizant.taxease.dto.requestdto;
 
 import com.cognizant.taxease.entity.entityEnum.NotificationCategory;
 import jakarta.validation.constraints.NotBlank;
@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BroadcastRequest {
+public class DirectNotificationRequest {
 
-    @NotBlank(message = "Broadcast message cannot be empty")
-    @Size(min = 10, max = 1000, message = "Broadcast message must be between 10 and 1000 characters")
+    @NotBlank(message = "Notification message cannot be empty")
+    @Size(max = 500, message = "Message cannot exceed 500 characters")
     private String message;
 
-    @NotNull(message = "Notification category is required for broadcasting")
+    @NotNull(message = "Notification category is required")
     private NotificationCategory category;
 }
