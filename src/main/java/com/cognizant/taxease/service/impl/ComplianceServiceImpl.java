@@ -51,16 +51,20 @@ public class ComplianceServiceImpl implements ComplianceService {
             }
             TaxFiling filing = taxFilingRepository.findById(request.getFilingId())
                     .orElseThrow(() -> new NoSuchElementException("Filing not found"));
+
             record.setFiling(filing);
             record.setPayment(null);
+
         } else if (request.getType() == ComplianceType.Payment) {
             if (request.getPaymentId() == null) {
                 throw new IllegalArgumentException("paymentId is required when type is Payment");
             }
             Payment payment = paymentRepository.findById(request.getPaymentId())
                     .orElseThrow(() -> new NoSuchElementException("Payment not found"));
+
             record.setPayment(payment);
             record.setFiling(null);
+
         } else {
             throw new IllegalArgumentException("Unsupported compliance type: " + request.getType());
         }

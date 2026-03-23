@@ -25,11 +25,11 @@ public class CreateComplianceRequest {
     private Long paymentId;
 
     @NotNull(message = "Compliance type (e.g., AUDIT, REVIEW) is required")
-    private ComplianceType type;
+    private ComplianceType type; // payment or filing
 
     @NotBlank(message = "Compliance result is required")
     @Size(max = 50, message = "Result status cannot exceed 50 characters")
-    private String result;
+    private String result; //compliance or non-compliance
 
     @Size(max = 1000, message = "Notes cannot exceed 1000 characters")
     private String notes;
