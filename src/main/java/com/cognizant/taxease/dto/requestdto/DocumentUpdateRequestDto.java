@@ -1,4 +1,4 @@
-package com.cognizant.taxease.dto;
+package com.cognizant.taxease.dto.requestdto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuditRequest {
+public class DocumentUpdateRequestDto {
 
-    @NotBlank(message = "Audit findings cannot be empty")
-    @Size(max = 2000, message = "Findings cannot exceed 2000 characters")
-    private String findings;
+    @NotBlank(message = "File URI or path cannot be empty")
+    @Size(max = 1000, message = "File URI cannot exceed 1000 characters")
+    private String fileUri;
 }
