@@ -58,8 +58,9 @@ public class AuditServiceImpl implements AuditService {
                 audit.getOfficer() != null ? audit.getOfficer().getId() : null,
                 audit.getScope(),
                 audit.getFindings(),
-                audit.getCreatedAt(),
-                audit.getStatus()
+                audit.getStatus(),
+                audit.getCreatedAt()
+
         );
     }
 }

@@ -48,7 +48,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     @Override
     public AuditLog get(Long id) {
-        return auditLogRepository.findById(id).orElseThrow();
+        return auditLogRepository.findById(id).orElseThrow(()->new NoSuchElementException("No record found"));
     }
 
     private void saveLog(User user, String action, String resource) {

@@ -2,12 +2,12 @@ package com.cognizant.taxease.controller;
 
 import com.cognizant.taxease.dto.ComplianceResponse;
 import com.cognizant.taxease.dto.CreateComplianceRequest;
-import com.cognizant.taxease.entity.ComplianceRecord;
+import com.cognizant.taxease.dto.UpdateComplianceRequest;
 import com.cognizant.taxease.service.ComplianceService;
+import jakarta.validation.Valid; // Required for validation enforcement
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.cognizant.taxease.dto.UpdateComplianceRequest;
 
 import java.util.List;
 
@@ -19,28 +19,31 @@ public class ComplianceController {
     private final ComplianceService complianceService;
 
     @PostMapping
-    public ComplianceResponse createCompliance(@RequestBody CreateComplianceRequest request) {
-        return complianceService.createCompliance(request);
+    public ResponseEntity<ComplianceResponse> createCompliance(
+            @Valid @RequestBody CreateComplianceRequest request) {
+        return ResponseEntity.ok(complianceService.createCompliance(request));
     }
 
     @GetMapping
-    public List<ComplianceResponse> getAllCompliance() {
-        return complianceService.getAllCompliance();
+    public ResponseEntity<List<ComplianceResponse>> getAllCompliance() {
+        return ResponseEntity.ok(complianceService.getAllCompliance());
     }
 
     @GetMapping("/{id}")
-    public ComplianceResponse getComplianceById(@PathVariable Long id){
-        return complianceService.getComplianceById(id);
+    public ResponseEntity<ComplianceResponse> getComplianceById(@PathVariable Long id){
+        return ResponseEntity.ok(complianceService.getComplianceById(id));
     }
 
     @PutMapping("/{id}")
-    public ComplianceResponse updateCompliance(@PathVariable Long id, @RequestBody UpdateComplianceRequest request) {
-        return complianceService.updateCompliance(id, request);
+    public ResponseEntity<ComplianceResponse> updateCompliance(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateComplianceRequest request) {
+        return ResponseEntity.ok(complianceService.updateCompliance(id, request));
     }
 
     @GetMapping("/taxpayer/{taxpayerId}")
-    public List<ComplianceResponse> getComplianceByTaxpayerId(@PathVariable Long taxpayerId){
-        return complianceService.getComplianceByTaxpayerId(taxpayerId);
+    public ResponseEntity<List<ComplianceResponse>> getComplianceByTaxpayerId(@PathVariable Long taxpayerId){
+        return ResponseEntity.ok(complianceService.getComplianceByTaxpayerId(taxpayerId));
     }
 
     @GetMapping("/result/{result}")

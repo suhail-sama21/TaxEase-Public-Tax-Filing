@@ -32,6 +32,7 @@ public class WebSecurityConfig {
 
                         // 2. Tax Filings & Documents
                         .requestMatchers("/api/filings/submit").hasRole("TAXPAYER")
+                        .requestMatchers("/api/taxpayers/**").hasRole("TAXPAYER")
                         .requestMatchers("/api/filings/taxpayer/**").hasAnyRole("TAXPAYER", "OFFICER")
                         .requestMatchers("/api/filings/*/status").hasRole("OFFICER")
                         .requestMatchers("/api/documents/upload").hasRole("TAXPAYER")
@@ -44,6 +45,7 @@ public class WebSecurityConfig {
                         // 4. Compliance & Audit
                         .requestMatchers("/api/compliance/**").hasAnyRole("COMPLIANCE", "MANAGER", "ADMIN")
                         .requestMatchers("/api/compliance/taxpayer/**").hasAnyRole("TAXPAYER", "COMPLIANCE")
+                        .requestMatchers("/api/audit/**").hasRole("AUDITOR")
 
                         // 5. Reporting & Analytics
                         .requestMatchers("/api/reports/payments/**", "/api/reports/revenue/**").hasAnyRole("MANAGER", "AUDITOR")

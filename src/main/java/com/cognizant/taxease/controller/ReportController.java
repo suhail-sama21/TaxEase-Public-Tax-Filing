@@ -6,11 +6,14 @@ import com.cognizant.taxease.dto.RevenueDashboardResponse;
 import com.cognizant.taxease.entity.Audit;
 import com.cognizant.taxease.entity.entityEnum.PaymentMethod;
 import com.cognizant.taxease.service.ReportService;
+import jakarta.validation.Valid; // Required for DTO validation
+import jakarta.validation.constraints.NotEmpty; // Example for list validation
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated; // Required for parameter validation
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,13 +22,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor
+@Validated // Enables validation for method parameters like @RequestParam
 public class ReportController {
 
     private final ReportService reportService;
 
     // Story 1: Payment Success Metrics
     @GetMapping("/payments/metrics")
-    public ResponseEntity<PaymentMetricsResponse> getPaymentMetrics(@RequestParam(required = false) PaymentMethod method) {
+    public ResponseEntity<PaymentMetricsResponse> getPaymentMetrics(
+            @RequestParam(required = false) PaymentMethod method) {
         return ResponseEntity.ok(reportService.getPaymentMetrics(method));
     }
 
@@ -55,7 +60,7 @@ public class ReportController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam String reportType,
-            @RequestParam List<String> metrics) {
+            @Valid @NotEmpty(message = "At least one metric must be selected") @RequestParam List<String> metrics) {
 
         byte[] reportData = reportService.generateCustomReport(startDate, endDate, reportType, metrics);
 

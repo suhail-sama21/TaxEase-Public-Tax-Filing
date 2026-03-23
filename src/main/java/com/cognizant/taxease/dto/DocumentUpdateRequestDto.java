@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CloseAuditRequest {
+public class DocumentUpdateRequestDto {
 
-    @NotBlank(message = "Audit findings are required to close an audit")
-    @Size(max = 2000, message = "Findings cannot exceed 2000 characters")
-    private String findings;
+    @NotBlank(message = "File URI or path cannot be empty")
+    @Size(max = 1000, message = "File URI cannot exceed 1000 characters")
+    private String fileUri;
 }
