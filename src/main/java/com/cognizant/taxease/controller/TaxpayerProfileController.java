@@ -1,11 +1,8 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.DocumentUpdateRequestDto;
-import com.cognizant.taxease.dto.DocumentUploadRequestDto;
-import com.cognizant.taxease.dto.TaxpayerDocumentResponseDto;
-import com.cognizant.taxease.dto.TaxpayerProfileResponseDto;
-import com.cognizant.taxease.dto.UpdateTaxpayerProfileRequestDto;
+import com.cognizant.taxease.dto.*;
 import com.cognizant.taxease.service.TaxpayerProfileService;
+import jakarta.validation.Valid; // Required for validation enforcement
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,9 +26,14 @@ public class TaxpayerProfileController {
         return ResponseEntity.ok(profile);
     }
 
+    /**
+     * Updates taxpayer profile.
+     * @Valid ensures phone numbers, names, and addresses meet DTO requirements.
+     */
     @PutMapping("/profile")
     @PreAuthorize("hasRole('TAXPAYER')")
-    public ResponseEntity<TaxpayerProfileResponseDto> updateProfile(@RequestBody UpdateTaxpayerProfileRequestDto request) {
+    public ResponseEntity<TaxpayerProfileResponseDto> updateProfile(
+            @Valid @RequestBody UpdateTaxpayerProfileRequestDto request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         TaxpayerProfileResponseDto updatedProfile = taxpayerProfileService.updateProfile(email, request);
         return ResponseEntity.ok(updatedProfile);
@@ -45,9 +47,14 @@ public class TaxpayerProfileController {
         return ResponseEntity.ok(documents);
     }
 
+    /**
+     * Uploads a profile document.
+     * @Valid ensures the file URI and document type are provided.
+     */
     @PostMapping("/documents/upload")
     @PreAuthorize("hasRole('TAXPAYER')")
-    public ResponseEntity<TaxpayerDocumentResponseDto> uploadDocument(@RequestBody DocumentUploadRequestDto request) {
+    public ResponseEntity<TaxpayerDocumentResponseDto> uploadDocument(
+            @Valid @RequestBody DocumentUploadRequestDto request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         TaxpayerDocumentResponseDto document = taxpayerProfileService.uploadDocument(email, request.getFileUri(), request.getDocType());
         return ResponseEntity.ok(document);
@@ -61,11 +68,14 @@ public class TaxpayerProfileController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Updates an existing document (e.g., updating the file link).
+     */
     @PutMapping("/documents/{documentId}")
     @PreAuthorize("hasRole('TAXPAYER')")
     public ResponseEntity<TaxpayerDocumentResponseDto> updateDocument(
             @PathVariable Long documentId,
-            @RequestBody DocumentUpdateRequestDto request) {
+            @Valid @RequestBody DocumentUpdateRequestDto request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         TaxpayerDocumentResponseDto updatedDocument = taxpayerProfileService.updateDocument(email, documentId, request.getFileUri());
         return ResponseEntity.ok(updatedDocument);
