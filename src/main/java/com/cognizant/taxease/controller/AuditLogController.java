@@ -1,6 +1,6 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.AuditLogResponse;
+import com.cognizant.taxease.dto.responsedto.AuditLogResponse;
 import com.cognizant.taxease.entity.AuditLog;
 import com.cognizant.taxease.service.AuditLogService;
 import lombok.RequiredArgsConstructor;

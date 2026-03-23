@@ -1,8 +1,8 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.BroadcastRequest;
-import com.cognizant.taxease.dto.DirectNotificationRequest;
-import com.cognizant.taxease.dto.NotificationResponse;
+import com.cognizant.taxease.dto.requestdto.BroadcastRequest;
+import com.cognizant.taxease.dto.requestdto.DirectNotificationRequest;
+import com.cognizant.taxease.dto.responsedto.NotificationResponse;
 import com.cognizant.taxease.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

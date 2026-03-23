@@ -1,7 +1,7 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.AuditResponse;
-import com.cognizant.taxease.dto.CloseAuditRequest;
+import com.cognizant.taxease.dto.responsedto.AuditResponse;
+import com.cognizant.taxease.dto.requestdto.CloseAuditRequest;
 import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.AuditService;
 import jakarta.validation.Valid; // Don't forget this import!

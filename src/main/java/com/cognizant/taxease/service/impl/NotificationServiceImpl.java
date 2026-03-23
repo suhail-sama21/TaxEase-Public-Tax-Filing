@@ -2,7 +2,7 @@ package com.cognizant.taxease.service.impl;
 
 import com.cognizant.taxease.dao.NotificationRepository;
 import com.cognizant.taxease.dao.UserRepository;
-import com.cognizant.taxease.dto.NotificationResponse;
+import com.cognizant.taxease.dto.responsedto.NotificationResponse;
 import com.cognizant.taxease.entity.Notification;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.NotificationCategory;

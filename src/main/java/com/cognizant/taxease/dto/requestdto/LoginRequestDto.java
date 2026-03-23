@@ -1,4 +1,4 @@
-package com.cognizant.taxease.dto;
+package com.cognizant.taxease.dto.requestdto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

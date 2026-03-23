@@ -1,6 +1,6 @@
 package com.cognizant.taxease.entity;
 
-import com.cognizant.taxease.dto.ComplianceResponse;
+import com.cognizant.taxease.dto.responsedto.ComplianceResponse;
 import com.cognizant.taxease.entity.entityEnum.ComplianceType;
 import jakarta.persistence.*;
 import lombok.*;

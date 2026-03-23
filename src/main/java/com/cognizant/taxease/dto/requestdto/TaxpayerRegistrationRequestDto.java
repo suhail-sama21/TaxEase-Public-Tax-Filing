@@ -1,4 +1,4 @@
-package com.cognizant.taxease.dto;
+package com.cognizant.taxease.dto.requestdto;
 
 import com.cognizant.taxease.entity.entityEnum.TaxpayerType;
 import jakarta.validation.constraints.Email;

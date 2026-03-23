@@ -1,6 +1,5 @@
-package com.cognizant.taxease.dto;
+package com.cognizant.taxease.dto.responsedto;
 
-import com.cognizant.taxease.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

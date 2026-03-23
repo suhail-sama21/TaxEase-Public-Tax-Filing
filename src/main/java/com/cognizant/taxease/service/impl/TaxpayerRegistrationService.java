@@ -1,7 +1,7 @@
 package com.cognizant.taxease.service.impl;
 
-import com.cognizant.taxease.dto.TaxpayerRegistrationRequestDto;
-import com.cognizant.taxease.dto.TaxpayerRegistrationResponseDto;
+import com.cognizant.taxease.dto.requestdto.TaxpayerRegistrationRequestDto;
+import com.cognizant.taxease.dto.responsedto.TaxpayerRegistrationResponseDto;
 import com.cognizant.taxease.entity.Taxpayer;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;

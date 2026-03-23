@@ -1,4 +1,4 @@
-package com.cognizant.taxease.dto;
+package com.cognizant.taxease.dto.requestdto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CloseAuditRequest {
+public class AuditRequest {
 
-    @NotBlank(message = "Audit findings are required to close an audit")
+    @NotBlank(message = "Audit findings cannot be empty")
     @Size(max = 2000, message = "Findings cannot exceed 2000 characters")
     private String findings;
 }

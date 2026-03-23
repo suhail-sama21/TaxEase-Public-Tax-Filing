@@ -1,7 +1,7 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.FilingDocumentRequestDTO;
-import com.cognizant.taxease.dto.FilingDocumentResponseDTO;
+import com.cognizant.taxease.dto.requestdto.FilingDocumentRequestDTO;
+import com.cognizant.taxease.dto.responsedto.FilingDocumentResponseDTO;
 import com.cognizant.taxease.service.FilingDocumentService;
 import jakarta.validation.Valid; // Required to activate DTO validation
 import lombok.RequiredArgsConstructor;
