@@ -4,6 +4,7 @@ import com.cognizant.taxease.dto.requestdto.PaymentRequest;
 import com.cognizant.taxease.entity.Payment;
 import com.cognizant.taxease.entity.entityEnum.PaymentMethod;
 import com.cognizant.taxease.service.PaymentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
+@Slf4j
 public class PaymentController {
 
     @Autowired
@@ -22,12 +24,10 @@ public class PaymentController {
      */
     @PostMapping("/pay")
     public Payment makePayment(@RequestBody PaymentRequest request) {
-        return paymentService.makePayment(
-                request.getFilingId(),
-                request.getMethod(),
-                request.getAmount(),
-                request.getStatus()
-        );
+        log.info("START: Initiating payment for Filing ID: {} | Amount: {}", request.getFilingId(), request.getAmount());
+        Payment response = paymentService.makePayment(request.getFilingId(), request.getMethod(), request.getAmount(), request.getStatus());
+        log.info("END: Payment processed | Transaction ID: {} | Status: {}", response.getId(), response.getStatus());
+        return response;
     }
 
     /**
@@ -35,7 +35,10 @@ public class PaymentController {
      */
     @GetMapping("/history/{taxpayerId}")
     public List<Payment> getPaymentHistory(@PathVariable Long taxpayerId) {
-        return paymentService.getPaymentsByTaxpayer(taxpayerId);
+        log.info("START: Fetching payment history for taxpayer {}", taxpayerId);
+        List<Payment> response = paymentService.getPaymentsByTaxpayer(taxpayerId);
+        log.info("END: Retrieved {} payment records", response.size());
+        return response;
     }
 
     /**
@@ -45,6 +48,9 @@ public class PaymentController {
     public Payment retryPayment(
             @PathVariable Long oldPaymentId,
             @RequestParam PaymentMethod newMethod) {
-        return paymentService.retryPayment(oldPaymentId, newMethod);
+        log.info("START: Retrying payment for old ID: {} | New Method: {}", oldPaymentId, newMethod);
+        Payment response = paymentService.retryPayment(oldPaymentId, newMethod);
+        log.info("END: Retry payment processed | New Transaction ID: {}", response.getId());
+        return response;
     }
 }

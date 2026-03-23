@@ -8,6 +8,7 @@ import com.cognizant.taxease.dto.responsedto.TaxpayerProfileResponseDto;
 import com.cognizant.taxease.service.TaxpayerProfileService;
 import jakarta.validation.Valid; // Required for validation enforcement
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/taxpayers")
 @RequiredArgsConstructor
+@Slf4j
 public class TaxpayerProfileController {
 
     private final TaxpayerProfileService taxpayerProfileService;
@@ -26,8 +28,10 @@ public class TaxpayerProfileController {
     @PreAuthorize("hasRole('TAXPAYER')")
     public ResponseEntity<TaxpayerProfileResponseDto> getProfile() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        TaxpayerProfileResponseDto profile = taxpayerProfileService.getProfile(email);
-        return ResponseEntity.ok(profile);
+        log.info("START: Fetching profile for user: {}", email);
+        TaxpayerProfileResponseDto response = taxpayerProfileService.getProfile(email);
+        log.info("END: Profile retrieved for user: {}", email);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -39,15 +43,19 @@ public class TaxpayerProfileController {
     public ResponseEntity<TaxpayerProfileResponseDto> updateProfile(
             @Valid @RequestBody UpdateTaxpayerProfileRequestDto request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        TaxpayerProfileResponseDto updatedProfile = taxpayerProfileService.updateProfile(email, request);
-        return ResponseEntity.ok(updatedProfile);
+        log.info("START: Updating profile for user: {}", email);
+        TaxpayerProfileResponseDto response = taxpayerProfileService.updateProfile(email, request);
+        log.info("END: Profile update complete for: {}", email);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/documents")
     @PreAuthorize("hasRole('TAXPAYER')")
     public ResponseEntity<List<TaxpayerDocumentResponseDto>> getDocuments() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("START: Fetching documents for user: {}", email);
         List<TaxpayerDocumentResponseDto> documents = taxpayerProfileService.getDocuments(email);
+        log.info("END: Retrieved {} documents for user: {}", documents.size(), email);
         return ResponseEntity.ok(documents);
     }
 
@@ -60,15 +68,19 @@ public class TaxpayerProfileController {
     public ResponseEntity<TaxpayerDocumentResponseDto> uploadDocument(
             @Valid @RequestBody DocumentUploadRequestDto request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        TaxpayerDocumentResponseDto document = taxpayerProfileService.uploadDocument(email, request.getFileUri(), request.getDocType());
-        return ResponseEntity.ok(document);
+        log.info("START: Document upload for user: {} | Type: {}", email, request.getDocType());
+        TaxpayerDocumentResponseDto response = taxpayerProfileService.uploadDocument(email, request.getFileUri(), request.getDocType());
+        log.info("END: Document uploaded successfully | ID: {}", response.getId());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/documents/{documentId}")
     @PreAuthorize("hasRole('TAXPAYER')")
     public ResponseEntity<Void> deleteDocument(@PathVariable Long documentId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("START: Deleting document ID: {} for user: {}", documentId, email);
         taxpayerProfileService.deleteDocument(email, documentId);
+        log.info("END: Document ID: {} deleted", documentId);
         return ResponseEntity.noContent().build();
     }
 
@@ -81,7 +93,9 @@ public class TaxpayerProfileController {
             @PathVariable Long documentId,
             @Valid @RequestBody DocumentUpdateRequestDto request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("START: Updating document ID: {} for user: {}", documentId, email);
         TaxpayerDocumentResponseDto updatedDocument = taxpayerProfileService.updateDocument(email, documentId, request.getFileUri());
+        log.info("END: Document ID: {} updated", documentId);
         return ResponseEntity.ok(updatedDocument);
     }
 }

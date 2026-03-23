@@ -6,6 +6,7 @@ import com.cognizant.taxease.service.TaxFilingService;
 import jakarta.validation.Valid; // Required for DTO validation
 import jakarta.validation.constraints.NotBlank; // For parameter validation
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated; // Required for @RequestParam validation
@@ -17,7 +18,8 @@ import java.util.List;
 @RequestMapping("/api/filings")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@Validated // Enables validation for @RequestParam
+@Validated
+@Slf4j// Enables validation for @RequestParam
 public class TaxFilingController {
 
     private final TaxFilingService taxFilingService;
@@ -29,12 +31,18 @@ public class TaxFilingController {
     @PostMapping("/submit")
     public ResponseEntity<TaxFilingResponseDTO> submitFiling(
             @Valid @RequestBody TaxFilingRequestDTO dto) {
-        return new ResponseEntity<>(taxFilingService.submitFiling(dto), HttpStatus.CREATED);
+        log.info("START: New tax filing submission for year: {}", dto.getPeriod());
+        TaxFilingResponseDTO response = taxFilingService.submitFiling(dto);
+        log.info("END: Filing submission successful | Filing ID: {}", response.getId());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/taxpayer/{taxpayerId}")
     public ResponseEntity<List<TaxFilingResponseDTO>> getHistory(@PathVariable Long taxpayerId) {
-        return ResponseEntity.ok(taxFilingService.getFilingHistory(taxpayerId));
+        log.info("START: Fetching filing history for taxpayer ID: {}", taxpayerId);
+        List<TaxFilingResponseDTO> response = taxFilingService.getFilingHistory(taxpayerId);
+        log.info("END: Retrieved {} filings", response.size());
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -46,6 +54,9 @@ public class TaxFilingController {
             @PathVariable Long filingId,
             @NotBlank(message = "Status is required") @RequestParam String status,
             @RequestParam(required = false) Long officerId) {
-        return ResponseEntity.ok(taxFilingService.updateFilingStatus(filingId, status, officerId));
+        log.info("START: Updating status for Filing ID: {} to {} | Officer: {}", filingId, status, officerId);
+        TaxFilingResponseDTO response = taxFilingService.updateFilingStatus(filingId, status, officerId);
+        log.info("END: Status update successful | Current Status: {}", response.getStatus());
+        return ResponseEntity.ok(response);
     }
 }
