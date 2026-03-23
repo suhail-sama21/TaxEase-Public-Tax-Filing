@@ -2,6 +2,7 @@ package com.cognizant.taxease.controller;
 
 import com.cognizant.taxease.dto.AuditResponse;
 import com.cognizant.taxease.dto.CloseAuditRequest;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 public class AuditController {
 
     private final AuditService auditService;
+    private final AuditLogService auditLogService;
 
     @GetMapping
     public ResponseEntity<List<AuditResponse>> getAllAudits() {

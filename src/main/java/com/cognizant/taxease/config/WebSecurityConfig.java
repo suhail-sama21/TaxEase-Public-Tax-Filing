@@ -47,12 +47,14 @@ public class WebSecurityConfig {
 
                         // 5. Reporting & Analytics
                         .requestMatchers("/api/reports/payments/**", "/api/reports/revenue/**").hasAnyRole("MANAGER", "AUDITOR")
-                        .requestMatchers("/api/reports/audits/**").hasAnyRole("AUDITOR", "ADMIN")
-                        .requestMatchers("/api/reports/custom/download").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/reports/audits/**").hasAnyRole("AUDITOR", "ADMINISTRATOR")
+                        .requestMatchers("/api/reports/custom/download").hasAnyRole("ADMINISTRATOR", "MANAGER")
 
                         // 6. Notifications
-                        .requestMatchers("/api/notifications/broadcast").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/notifications/broadcast").hasAnyRole("ADMINISTRATOR", "MANAGER")
                         .requestMatchers("/api/notifications/user/**").authenticated() // Logic handled in service for self vs officer
+
+                        .requestMatchers("/api/audit-logs/**").hasRole("ADMINISTRATOR")
 
                         .anyRequest().authenticated()
                 )

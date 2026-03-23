@@ -5,6 +5,7 @@ import com.cognizant.taxease.dto.AuditResponse;
 import com.cognizant.taxease.dto.CloseAuditRequest;
 import com.cognizant.taxease.entity.Audit;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.NoSuchElementException;
 public class AuditServiceImpl implements AuditService {
 
     private final AuditRepository auditRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     public List<AuditResponse> getAllAudits() {
@@ -30,6 +32,7 @@ public class AuditServiceImpl implements AuditService {
     public AuditResponse getAuditById(Long id) {
         Audit audit = auditRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Audit not found"));
+        auditLogService.record("AUDIT_VIEW", "audits/" + id);
         return mapToResponse(audit);
     }
 
@@ -45,6 +48,7 @@ public class AuditServiceImpl implements AuditService {
         audit.setStatus(StatusBasic.Inactive);
 
         Audit savedAudit = auditRepository.save(audit);
+        auditLogService.record("AUDIT_CLOSE", "audits/" + savedAudit.getId());
         return mapToResponse(savedAudit);
     }
 
