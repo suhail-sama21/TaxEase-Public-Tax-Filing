@@ -35,6 +35,6 @@ public class AuthServiceImpl implements com.cognizant.taxease.service.AuthServic
 
         String token = authUtil.generateToken(userDetails.getUsername(),role);
 
-        return new LoginResponseDto(token,userDetails.getUsername(),role);
+        return new LoginResponseDto(token);
     }
 }
