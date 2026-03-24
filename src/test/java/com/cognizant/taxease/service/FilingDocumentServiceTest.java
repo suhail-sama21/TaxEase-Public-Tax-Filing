@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,7 +92,7 @@ public class FilingDocumentServiceTest {
     }
 
     @Test
-    void testGetDocumentsByFiling_Success() {
+    void testGetDocumentsByFiling_Success() throws AccessDeniedException {
         // Arrange
         when(documentRepository.findByFilingId(50L)).thenReturn(List.of(mockDocument));
 
