@@ -1,9 +1,9 @@
 package com.cognizant.taxease.service;
 
 import com.cognizant.taxease.dao.*;
-import com.cognizant.taxease.dto.ComplianceResponse;
-import com.cognizant.taxease.dto.CreateComplianceRequest;
-import com.cognizant.taxease.dto.UpdateComplianceRequest;
+import com.cognizant.taxease.dto.responsedto.ComplianceResponse;
+import com.cognizant.taxease.dto.requestdto.CreateComplianceRequest;
+import com.cognizant.taxease.dto.requestdto.UpdateComplianceRequest;
 import com.cognizant.taxease.entity.Audit;
 import com.cognizant.taxease.entity.ComplianceRecord;
 import com.cognizant.taxease.entity.Payment;

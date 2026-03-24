@@ -1,8 +1,8 @@
 package com.cognizant.taxease.service;
 
 import com.cognizant.taxease.dao.AuditRepository;
-import com.cognizant.taxease.dto.AuditResponse;
-import com.cognizant.taxease.dto.CloseAuditRequest;
+import com.cognizant.taxease.dto.responsedto.AuditResponse;
+import com.cognizant.taxease.dto.requestdto.CloseAuditRequest;
 import com.cognizant.taxease.entity.Audit;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
