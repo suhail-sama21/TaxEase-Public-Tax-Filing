@@ -49,7 +49,7 @@ public class TaxFilingServiceImpl implements TaxFilingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<TaxFilingResponseDTO> getFilingHistory(Long taxpayerId) {
         UserDetails userDetails=(UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user=userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
