@@ -13,7 +13,6 @@ import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.ComplianceType;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import com.cognizant.taxease.service.impl.ComplianceServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -32,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ComplianceServiceImplTest {
+class ComplianceServiceTest {
 
     @Mock
     private ComplianceRecordRepository complianceRecordRepository;
