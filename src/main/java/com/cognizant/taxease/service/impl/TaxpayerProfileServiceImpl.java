@@ -15,6 +15,7 @@ import com.cognizant.taxease.exception.DocumentAlreadyExistsException;
 import com.cognizant.taxease.exception.DocumentNotFoundException;
 import com.cognizant.taxease.exception.DocumentUploadException;
 import com.cognizant.taxease.exception.DocumentVerificationException;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.TaxpayerProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
     private final UserRepository userRepository;
     private final TaxpayerRepository taxpayerRepository;
     private final TaxpayerDocumentRepository taxpayerDocumentRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     public TaxpayerProfileResponseDto getProfile(String email) {
@@ -61,7 +63,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
         taxpayer.setAddress(request.getAddress());
         taxpayer.setContactInfo(request.getContactInfo());
         taxpayerRepository.save(taxpayer);
-
+        auditLogService.record("PROFILE UPDATED","/user/"+user.getId());
         return getProfile(email); // Return updated profile
     }
 
@@ -105,6 +107,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
                 .build();
 
         TaxpayerDocument savedDocument = taxpayerDocumentRepository.save(document);
+        auditLogService.record("DOCUMENT_UPLOADED","/Taxpayer/"+taxpayer.getId());
         return convertToDto(savedDocument);
     }
 
@@ -129,6 +132,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
 
         // No file deletion needed since we're storing links, not files
         taxpayerDocumentRepository.delete(document);
+        auditLogService.record("DOCUMENT DELETED","/Taxpayer/"+taxpayer.getId());
     }
 
     @Override
@@ -159,6 +163,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
         document.setVerificationStatus(VerificationStatus.Pending); // Reset to pending after update
 
         TaxpayerDocument updatedDocument = taxpayerDocumentRepository.save(document);
+        auditLogService.record("DOCUMENT_UPDATED","/Taxpayer/"+taxpayer.getId());
         return convertToDto(updatedDocument);
     }
 
