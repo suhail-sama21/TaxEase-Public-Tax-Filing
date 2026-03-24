@@ -46,7 +46,7 @@ public class TaxFilingServiceImpl implements TaxFilingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<TaxFilingResponseDTO> getFilingHistory(Long taxpayerId) {
         auditLogService.record("FILING_HISTORY_VIEW", "taxpayer/" + taxpayerId + "/filings");
         return taxFilingRepository.findByTaxpayerId(taxpayerId).stream()

@@ -46,7 +46,7 @@ public class FilingDocumentServiceImpl implements FilingDocumentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<FilingDocumentResponseDTO> getDocumentsByFiling(Long filingId) {
         auditLogService.record("DOCUMENT_LIST_VIEW", "filings/" + filingId + "/documents");
         return documentRepository.findByFilingId(filingId).stream()
