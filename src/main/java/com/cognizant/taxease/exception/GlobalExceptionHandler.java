@@ -38,63 +38,40 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
+        String message = ex.getMessage();
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", Instant.now());
-        body.put("status", 500);
-        body.put("error", "Internal Server Error");
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+
+        // Parse message to determine appropriate response
+        if (message != null) {
+            if (message.contains("already exists") || message.contains("Account already exists")) {
+                body.put("status", 409);
+                body.put("error", "Conflict");
+            } else if (message.contains("does not belong") || message.contains("Document does not exist")) {
+                body.put("status", 404);
+                body.put("error", "Not Found");
+            } else if (message.contains("can only be deleted if") || message.contains("Cannot update")) {
+                body.put("status", 403);
+                body.put("error", "Forbidden");
+            } else if (message.contains("File URI is required") || message.contains("Unable to generate")) {
+                body.put("status", 500);
+                body.put("error", "Internal Server Error");
+            } else {
+                body.put("status", 500);
+                body.put("error", "Internal Server Error");
+            }
+        } else {
+            body.put("status", 500);
+            body.put("error", "Internal Server Error");
+        }
+
+        body.put("message", message);
+        return ResponseEntity.status(body.get("status").equals(409) ? HttpStatus.CONFLICT :
+                                   body.get("status").equals(404) ? HttpStatus.NOT_FOUND :
+                                   body.get("status").equals(403) ? HttpStatus.FORBIDDEN :
+                                   HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
-    @ExceptionHandler(DocumentAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleDocumentAlreadyExists(DocumentAlreadyExistsException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", 409);
-        body.put("error", "Conflict");
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
-
-    @ExceptionHandler(DocumentNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleDocumentNotFound(DocumentNotFoundException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", 404);
-        body.put("error", "Document Not Found");
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
-
-    @ExceptionHandler(DocumentVerificationException.class)
-    public ResponseEntity<Map<String, Object>> handleDocumentVerification(DocumentVerificationException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", 403);
-        body.put("error", "Forbidden");
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
-    }
-
-    @ExceptionHandler(DocumentUploadException.class)
-    public ResponseEntity<Map<String, Object>> handleDocumentUpload(DocumentUploadException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", 500);
-        body.put("error", "Upload Failed");
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }
-
-    @ExceptionHandler(InvalidDocumentTypeException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidDocumentType(InvalidDocumentTypeException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now());
-        body.put("status", 400);
-        body.put("error", "Invalid Document Type");
-        body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
-    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
