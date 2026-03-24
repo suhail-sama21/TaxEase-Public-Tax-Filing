@@ -1,9 +1,9 @@
 package com.cognizant.taxease.service.impl;
 
 import com.cognizant.taxease.dao.*;
-import com.cognizant.taxease.dto.ComplianceResponse;
-import com.cognizant.taxease.dto.CreateComplianceRequest;
-import com.cognizant.taxease.dto.UpdateComplianceRequest;
+import com.cognizant.taxease.dto.responsedto.ComplianceResponse;
+import com.cognizant.taxease.dto.requestdto.CreateComplianceRequest;
+import com.cognizant.taxease.dto.requestdto.UpdateComplianceRequest;
 import com.cognizant.taxease.entity.*;
 import com.cognizant.taxease.entity.entityEnum.ComplianceType;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
@@ -11,15 +11,10 @@ import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.ComplianceService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLXML;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import static com.cognizant.taxease.entity.entityEnum.UserRole.OFFICER;
 
 @Service
 @RequiredArgsConstructor

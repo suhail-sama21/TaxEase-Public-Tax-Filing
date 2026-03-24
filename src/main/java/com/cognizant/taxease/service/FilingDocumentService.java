@@ -1,7 +1,7 @@
 package com.cognizant.taxease.service;
 
-import com.cognizant.taxease.dto.FilingDocumentRequestDTO;
-import com.cognizant.taxease.dto.FilingDocumentResponseDTO;
+import com.cognizant.taxease.dto.requestdto.FilingDocumentRequestDTO;
+import com.cognizant.taxease.dto.responsedto.FilingDocumentResponseDTO;
 import java.util.List;
 
 /**

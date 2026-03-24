@@ -1,7 +1,7 @@
 package com.cognizant.taxease.service.impl;
 
-import com.cognizant.taxease.dto.FilingDocumentRequestDTO;
-import com.cognizant.taxease.dto.FilingDocumentResponseDTO;
+import com.cognizant.taxease.dto.requestdto.FilingDocumentRequestDTO;
+import com.cognizant.taxease.dto.responsedto.FilingDocumentResponseDTO;
 import com.cognizant.taxease.entity.FilingDocument;
 import com.cognizant.taxease.entity.TaxFiling;
 import com.cognizant.taxease.dao.FilingDocumentRepository;

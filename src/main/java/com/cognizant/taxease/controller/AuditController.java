@@ -1,16 +1,17 @@
 package com.cognizant.taxease.controller;
 
-import com.cognizant.taxease.dto.AuditResponse;
-import com.cognizant.taxease.dto.CloseAuditRequest;
+import com.cognizant.taxease.dto.responsedto.AuditResponse;
+import com.cognizant.taxease.dto.requestdto.CloseAuditRequest;
 import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.AuditService;
 import jakarta.validation.Valid; // Don't forget this import!
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/audit")
 @RequiredArgsConstructor
@@ -21,12 +22,18 @@ public class AuditController {
 
     @GetMapping
     public ResponseEntity<List<AuditResponse>> getAllAudits() {
-        return ResponseEntity.ok(auditService.getAllAudits());
+        log.info("START: Fetching all audits");
+        List<AuditResponse> response = auditService.getAllAudits();
+        log.info("END: Fetched {} audits", response.size());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AuditResponse> getAuditById(@PathVariable Long id) {
-        return ResponseEntity.ok(auditService.getAuditById(id));
+        log.info("START: Fetching audit details for ID: {}", id);
+        AuditResponse response = auditService.getAuditById(id);
+        log.info("END: Successfully retrieved audit ID: {}", id);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -37,6 +44,9 @@ public class AuditController {
     public ResponseEntity<AuditResponse> closeAudit(
             @PathVariable Long id,
             @Valid @RequestBody CloseAuditRequest request) {
-        return ResponseEntity.ok(auditService.closeAudit(id, request));
+        log.info("START: Closing audit ID: {} | Findings: {}", id, request.getFindings());
+        AuditResponse response = auditService.closeAudit(id, request);
+        log.info("END: Audit ID: {} closed successfully | Status: {}", id, response.getStatus());
+        return ResponseEntity.ok(response);
     }
 }

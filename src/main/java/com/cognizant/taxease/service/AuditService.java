@@ -1,7 +1,7 @@
 package com.cognizant.taxease.service;
 
-import com.cognizant.taxease.dto.AuditResponse;
-import com.cognizant.taxease.dto.CloseAuditRequest;
+import com.cognizant.taxease.dto.responsedto.AuditResponse;
+import com.cognizant.taxease.dto.requestdto.CloseAuditRequest;
 
 import java.util.List;
 
