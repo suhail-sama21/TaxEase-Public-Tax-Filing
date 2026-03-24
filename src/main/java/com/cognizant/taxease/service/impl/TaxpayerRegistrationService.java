@@ -6,8 +6,6 @@ import com.cognizant.taxease.entity.Taxpayer;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import com.cognizant.taxease.entity.entityEnum.UserRole;
-import com.cognizant.taxease.exception.EmailAlreadyExistsException;
-import com.cognizant.taxease.exception.TaxpayerIdGenerationException;
 import com.cognizant.taxease.dao.TaxpayerRepository;
 import com.cognizant.taxease.dao.UserRepository;
 import com.cognizant.taxease.service.AuditLogService;
@@ -31,7 +29,7 @@ public class TaxpayerRegistrationService {
     public TaxpayerRegistrationResponseDto registerTaxpayer(TaxpayerRegistrationRequestDto request) {
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException("Account already exists for this email");
+            throw new RuntimeException("Account already exists for this email");
         }
 
         // Generate unique 11-digit ID
@@ -74,7 +72,7 @@ public class TaxpayerRegistrationService {
         int attempts = 0;
         do {
             if (attempts++ > 100) {
-                throw new TaxpayerIdGenerationException("Unable to generate unique taxpayer ID after multiple attempts");
+                throw new RuntimeException("Unable to generate unique taxpayer ID after multiple attempts");
             }
             id = String.format("%011d", random.nextInt(1000000000) + 1000000000L); // 11-digit number
         } while (taxpayerRepository.existsByTaxpayerIdNumber(id));

@@ -11,10 +11,6 @@ import com.cognizant.taxease.entity.TaxpayerDocument;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.DocTypeTaxpayer;
 import com.cognizant.taxease.entity.entityEnum.VerificationStatus;
-import com.cognizant.taxease.exception.DocumentAlreadyExistsException;
-import com.cognizant.taxease.exception.DocumentNotFoundException;
-import com.cognizant.taxease.exception.DocumentUploadException;
-import com.cognizant.taxease.exception.DocumentVerificationException;
 import com.cognizant.taxease.service.TaxpayerProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -81,7 +77,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
     @Transactional
     public TaxpayerDocumentResponseDto uploadDocument(String email, String fileUri, DocTypeTaxpayer docType) {
         if (fileUri == null || fileUri.trim().isEmpty()) {
-            throw new DocumentUploadException("File URI is required");
+            throw new RuntimeException("File URI is required");
         }
 
         User user = userRepository.findByEmail(email)
@@ -93,7 +89,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
         boolean exists = taxpayerDocumentRepository.findByTaxpayer(taxpayer).stream()
                 .anyMatch(doc -> doc.getDocType().equals(docType));
         if (exists) {
-            throw new DocumentAlreadyExistsException("Document of type " + docType + " already exists. Delete the existing one to upload again.");
+            throw new RuntimeException("Document of type " + docType + " already exists. Delete the existing one to upload again.");
         }
 
         // Save document entity with the provided URI
@@ -117,14 +113,14 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
                 .orElseThrow(() -> new NoSuchElementException("Taxpayer not found"));
 
         TaxpayerDocument document = taxpayerDocumentRepository.findById(documentId)
-                .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
+                .orElseThrow(() -> new RuntimeException("Document not found"));
 
         if (!document.getTaxpayer().equals(taxpayer)) {
-            throw new DocumentNotFoundException("Document does not belong to this taxpayer");
+            throw new RuntimeException("Document does not belong to this taxpayer");
         }
 
         if (document.getVerificationStatus() != VerificationStatus.Rejected) {
-            throw new DocumentVerificationException("Document can only be deleted if status is Rejected. Current status: " + document.getVerificationStatus());
+            throw new RuntimeException("Document can only be deleted if status is Rejected. Current status: " + document.getVerificationStatus());
         }
 
         // No file deletion needed since we're storing links, not files
@@ -135,7 +131,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
     @Transactional
     public TaxpayerDocumentResponseDto updateDocument(String email, Long documentId, String fileUri) {
         if (fileUri == null || fileUri.trim().isEmpty()) {
-            throw new DocumentUploadException("File URI is required");
+            throw new RuntimeException("File URI is required");
         }
 
         User user = userRepository.findByEmail(email)
@@ -144,14 +140,14 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
                 .orElseThrow(() -> new NoSuchElementException("Taxpayer not found"));
 
         TaxpayerDocument document = taxpayerDocumentRepository.findById(documentId)
-                .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
+                .orElseThrow(() -> new RuntimeException("Document not found"));
 
         if (!document.getTaxpayer().equals(taxpayer)) {
-            throw new DocumentNotFoundException("Document does not belong to this taxpayer");
+            throw new RuntimeException("Document does not belong to this taxpayer");
         }
 
         if (document.getVerificationStatus() == VerificationStatus.Rejected) {
-            throw new DocumentVerificationException("Cannot update a rejected document. Please delete and upload again.");
+            throw new RuntimeException("Cannot update a rejected document. Please delete and upload again.");
         }
 
         // Update document with new URI
