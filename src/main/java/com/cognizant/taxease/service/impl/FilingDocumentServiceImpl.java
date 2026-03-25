@@ -54,8 +54,8 @@ public class FilingDocumentServiceImpl implements FilingDocumentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<FilingDocumentResponseDTO> getDocumentsByFiling(Long filingId) throws org.springframework.security.access.AccessDeniedException {
+    @Transactional
+    public List<FilingDocumentResponseDTO> getDocumentsByFiling(Long filingId) {
         auditLogService.record("DOCUMENT_LIST_VIEW", "filings/" + filingId + "/documents");
         UserDetails userDetails=(UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user=userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
