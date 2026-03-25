@@ -1,5 +1,6 @@
 package com.cognizant.taxease.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,14 @@ import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Map<String, String>> handleTokenExpired(ExpiredJwtException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "Token Expired");
+        body.put("message", "The provided security token has expired. Please log in again.");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
         Map<String, Object> body = new HashMap<>();

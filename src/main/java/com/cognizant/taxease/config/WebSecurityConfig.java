@@ -22,8 +22,7 @@ public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final HandlerExceptionResolver resolver;
-    public WebSecurityConfig(
-            JwtAuthFilter jwtAuthFilter,
+    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.resolver = resolver;
@@ -55,7 +54,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/payments/history/**").hasAnyRole("TAXPAYER", "OFFICER")
 
                         // 4. Compliance & Audit
-                        .requestMatchers("/api/compliance/**").hasAnyRole("COMPLIANCE", "MANAGER", "ADMIN")
+                        .requestMatchers("/api/compliance/**").hasAnyRole("COMPLIANCE", "MANAGER", "ADMIN","TAXPAYER")
                         .requestMatchers("/api/compliance/taxpayer/**").hasAnyRole("TAXPAYER", "COMPLIANCE")
                         .requestMatchers("/api/audit/**").hasRole("AUDITOR")
 
