@@ -9,6 +9,7 @@ import com.cognizant.taxease.dao.FilingDocumentRepository;
 import com.cognizant.taxease.dao.TaxFilingRepository;
 import com.cognizant.taxease.entity.Taxpayer;
 import com.cognizant.taxease.entity.User;
+import com.cognizant.taxease.entity.entityEnum.UserRole;
 import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.FilingDocumentService;
 import lombok.RequiredArgsConstructor;
@@ -58,11 +59,13 @@ public class FilingDocumentServiceImpl implements FilingDocumentService {
         auditLogService.record("DOCUMENT_LIST_VIEW", "filings/" + filingId + "/documents");
         UserDetails userDetails=(UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user=userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
-        Taxpayer taxpayer=user.getTaxpayer();
-        List<TaxFiling> taxfilings=taxpayer.getTaxFilings();
-        long c=taxfilings.stream().filter(filing->filing.getId().equals(filingId)).count();
-        if(c==0) {
-            throw new AccessDeniedException("Access Denied");
+        if(user.getRole().equals(UserRole.TAXPAYER)) {
+            Taxpayer taxpayer = user.getTaxpayer();
+            List<TaxFiling> taxfilings = taxpayer.getTaxFilings();
+            long c = taxfilings.stream().filter(filing -> filing.getId().equals(filingId)).count();
+            if (c == 0) {
+                throw new AccessDeniedException("Access Denied");
+            }
         }
         return documentRepository.findByFilingId(filingId).stream()
                 .map(doc -> FilingDocumentResponseDTO.builder()

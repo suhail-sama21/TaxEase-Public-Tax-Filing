@@ -9,6 +9,7 @@ import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import com.cognizant.taxease.dao.TaxFilingRepository;
 import com.cognizant.taxease.dao.TaxpayerRepository;
 import com.cognizant.taxease.dao.UserRepository;
+import com.cognizant.taxease.entity.entityEnum.UserRole;
 import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.TaxFilingService;
 import lombok.RequiredArgsConstructor;
@@ -53,9 +54,12 @@ public class TaxFilingServiceImpl implements TaxFilingService {
     public List<TaxFilingResponseDTO> getFilingHistory(Long taxpayerId) {
         UserDetails userDetails=(UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user=userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
-        Taxpayer taxpayer=user.getTaxpayer();
-        if(!taxpayer.getId().equals(taxpayerId)){
-            throw new AccessDeniedException("Access Denied");
+        if(user.getRole().equals(UserRole.TAXPAYER)) {
+            Taxpayer taxpayer = user.getTaxpayer();
+
+            if (!taxpayer.getId().equals(taxpayerId)) {
+                throw new AccessDeniedException("Access Denied");
+            }
         }
         auditLogService.record("FILING_HISTORY_VIEW", "taxpayer/" + taxpayerId + "/filings");
         return taxFilingRepository.findByTaxpayerId(taxpayerId).stream()
