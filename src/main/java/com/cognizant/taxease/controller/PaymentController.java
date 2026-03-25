@@ -1,7 +1,9 @@
 package com.cognizant.taxease.controller;
 
 import com.cognizant.taxease.dto.requestdto.PaymentRequest;
-import com.cognizant.taxease.entity.Payment;
+import com.cognizant.taxease.dto.responsedto.PaymentMetricsResponse;
+import com.cognizant.taxease.dto.responsedto.PaymentResponseDto;
+import com.cognizant.taxease.dto.responsedto.RevenueDashboardResponse;
 import com.cognizant.taxease.entity.entityEnum.PaymentMethod;
 import com.cognizant.taxease.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,39 +20,41 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    /**
-     * Endpoint for TAXFR-10: Make a payment
-     * Accepts a JSON body via the PaymentRequest DTO
-     */
     @PostMapping("/pay")
-    public Payment makePayment(@RequestBody PaymentRequest request) {
+    public PaymentResponseDto makePayment(@RequestBody PaymentRequest request) {
         log.info("START: Initiating payment for Filing ID: {} | Amount: {}", request.getFilingId(), request.getAmount());
-        Payment response = paymentService.makePayment(request.getFilingId(), request.getMethod(), request.getAmount(), request.getStatus());
-        log.info("END: Payment processed | Transaction ID: {} | Status: {}", response.getId(), response.getStatus());
+        PaymentResponseDto response = paymentService.makePayment(request.getFilingId(), request.getMethod(), request.getAmount(), request.getStatus());
+        log.info("END: Payment processed | Payment ID: {} | Status: {}", response.getId(), response.getStatus());
         return response;
     }
 
-    /**
-     * Endpoint for TAXFR-11: Get payment history
-     */
     @GetMapping("/history/{taxpayerId}")
-    public List<Payment> getPaymentHistory(@PathVariable Long taxpayerId) {
+    public List<PaymentResponseDto> getPaymentHistory(@PathVariable Long taxpayerId) {
         log.info("START: Fetching payment history for taxpayer {}", taxpayerId);
-        List<Payment> response = paymentService.getPaymentsByTaxpayer(taxpayerId);
+        List<PaymentResponseDto> response = paymentService.getPaymentsByTaxpayer(taxpayerId);
         log.info("END: Retrieved {} payment records", response.size());
         return response;
     }
 
-    /**
-     * Endpoint for TAXFR-12: Retry a failed payment
-     */
     @PostMapping("/retry/{oldPaymentId}")
-    public Payment retryPayment(
+    public PaymentResponseDto retryPayment(
             @PathVariable Long oldPaymentId,
             @RequestParam PaymentMethod newMethod) {
         log.info("START: Retrying payment for old ID: {} | New Method: {}", oldPaymentId, newMethod);
-        Payment response = paymentService.retryPayment(oldPaymentId, newMethod);
-        log.info("END: Retry payment processed | New Transaction ID: {}", response.getId());
+        PaymentResponseDto response = paymentService.retryPayment(oldPaymentId, newMethod);
+        log.info("END: Retry payment processed | New Payment ID: {}", response.getId());
         return response;
+    }
+
+    @GetMapping("/metrics")
+    public PaymentMetricsResponse getPaymentMetrics() {
+        log.info("START: Fetching payment metrics");
+        return paymentService.getPaymentMetrics();
+    }
+
+    @GetMapping("/revenue")
+    public RevenueDashboardResponse getRevenueDashboard() {
+        log.info("START: Fetching revenue dashboard");
+        return paymentService.getRevenueDashboard();
     }
 }
