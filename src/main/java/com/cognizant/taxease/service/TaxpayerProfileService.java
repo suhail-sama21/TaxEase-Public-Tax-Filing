@@ -14,4 +14,5 @@ public interface TaxpayerProfileService {
     TaxpayerDocumentResponseDto uploadDocument(String email, String fileUri, DocTypeTaxpayer docType);
     void deleteDocument(String email, Long documentId);
     TaxpayerDocumentResponseDto updateDocument(String email, Long documentId, String fileUri);
+    TaxpayerDocumentResponseDto verifyDocumentStatus(String email, Long documentId, com.cognizant.taxease.entity.entityEnum.VerificationStatus verificationStatus);
 }

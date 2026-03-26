@@ -43,6 +43,7 @@ public class WebSecurityConfig {
 
                         // 2. Tax Filings & Documents
                         .requestMatchers("/api/filings/submit").hasRole("TAXPAYER")
+                        .requestMatchers("/api/taxpayers/documents/*/verify").hasAnyRole("OFFICER", "ADMINISTRATOR")
                         .requestMatchers("/api/taxpayers/**").hasRole("TAXPAYER")
                         .requestMatchers("/api/filings/taxpayer/**").hasAnyRole("TAXPAYER", "OFFICER")
                         .requestMatchers("/api/filings/*/status").hasRole("OFFICER")

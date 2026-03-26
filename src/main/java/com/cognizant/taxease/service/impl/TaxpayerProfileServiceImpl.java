@@ -165,6 +165,35 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
         return convertToDto(updatedDocument);
     }
 
+    @Override
+    @Transactional
+    public TaxpayerDocumentResponseDto verifyDocumentStatus(String email, Long documentId, VerificationStatus verificationStatus) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        if (user.getRole() != com.cognizant.taxease.entity.entityEnum.UserRole.OFFICER
+                && user.getRole() != com.cognizant.taxease.entity.entityEnum.UserRole.ADMINISTRATOR) {
+            throw new RuntimeException("Only officers or administrators can verify documents");
+        }
+
+        TaxpayerDocument document = taxpayerDocumentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        if (verificationStatus == null) {
+            throw new RuntimeException("Verification status is required");
+        }
+
+        if (verificationStatus == VerificationStatus.Pending) {
+            throw new RuntimeException("Document cannot be set to Pending by verification action");
+        }
+
+        document.setVerificationStatus(verificationStatus);
+
+        TaxpayerDocument savedDocument = taxpayerDocumentRepository.save(document);
+        auditLogService.record("DOCUMENT_VERIFICATION", "verify_document/" + document.getId());
+        return convertToDto(savedDocument);
+    }
+
     private TaxpayerDocumentResponseDto convertToDto(TaxpayerDocument document) {
         return TaxpayerDocumentResponseDto.builder()
                 .id(document.getId())

@@ -45,6 +45,9 @@ class TaxpayerProfileServiceTest {
     @Mock
     private TaxpayerDocumentRepository taxpayerDocumentRepository;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     @InjectMocks
     private TaxpayerProfileServiceImpl profileService;
 
@@ -365,6 +368,101 @@ class TaxpayerProfileServiceTest {
             );
         });
         assertTrue(exception.getMessage().contains("already exists"));
+    }
+
+    @Test
+    @DisplayName("Should allow officer to verify a pending document")
+    void testVerifyDocumentStatusSuccess() {
+        // Arrange
+        User officerUser = User.builder()
+                .id(2L)
+                .name("Officer")
+                .email("officer@example.com")
+                .role(UserRole.OFFICER)
+                .build();
+
+        TaxpayerDocument doc = TaxpayerDocument.builder()
+                .id(1L)
+                .taxpayer(mockTaxpayer)
+                .docType(DocTypeTaxpayer.IDProof)
+                .fileUri("https://drive.google.com/file/d/1abc123/view")
+                .verificationStatus(VerificationStatus.Pending)
+                .build();
+
+        when(userRepository.findByEmail("officer@example.com")).thenReturn(Optional.of(officerUser));
+        when(taxpayerDocumentRepository.findById(1L)).thenReturn(Optional.of(doc));
+        when(taxpayerDocumentRepository.save(any(TaxpayerDocument.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        TaxpayerDocumentResponseDto result = profileService.verifyDocumentStatus("officer@example.com", 1L, VerificationStatus.Verified);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(VerificationStatus.Verified, result.getVerificationStatus());
+        verify(taxpayerDocumentRepository, times(1)).save(any(TaxpayerDocument.class));
+    }
+
+    @Test
+    @DisplayName("Should reject verify when user is not officer/admin")
+    void testVerifyDocumentStatusUnauthorizedRole() {
+        // Arrange
+        when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(mockUser));
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                profileService.verifyDocumentStatus("john@example.com", 1L, VerificationStatus.Verified));
+
+        assertEquals("Only officers or administrators can verify documents", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when document not found during verify")
+    void testVerifyDocumentStatusDocumentNotFound() {
+        // Arrange
+        User officerUser = User.builder()
+                .id(2L)
+                .name("Officer")
+                .email("officer@example.com")
+                .role(UserRole.OFFICER)
+                .build();
+
+        when(userRepository.findByEmail("officer@example.com")).thenReturn(Optional.of(officerUser));
+        when(taxpayerDocumentRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                profileService.verifyDocumentStatus("officer@example.com", 1L, VerificationStatus.Rejected));
+
+        assertEquals("Document not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should prevent setting status back to Pending")
+    void testVerifyDocumentStatusCannotSetPending() {
+        // Arrange
+        User officerUser = User.builder()
+                .id(2L)
+                .name("Officer")
+                .email("officer@example.com")
+                .role(UserRole.OFFICER)
+                .build();
+
+        TaxpayerDocument doc = TaxpayerDocument.builder()
+                .id(1L)
+                .taxpayer(mockTaxpayer)
+                .docType(DocTypeTaxpayer.IDProof)
+                .fileUri("https://drive.google.com/file/d/1abc123/view")
+                .verificationStatus(VerificationStatus.Pending)
+                .build();
+
+        when(userRepository.findByEmail("officer@example.com")).thenReturn(Optional.of(officerUser));
+        when(taxpayerDocumentRepository.findById(1L)).thenReturn(Optional.of(doc));
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                profileService.verifyDocumentStatus("officer@example.com", 1L, VerificationStatus.Pending));
+
+        assertEquals("Document cannot be set to Pending by verification action", exception.getMessage());
     }
 
     // ==================== Delete Document Tests ====================

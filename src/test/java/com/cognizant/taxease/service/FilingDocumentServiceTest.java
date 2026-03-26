@@ -6,11 +6,18 @@ import static org.mockito.Mockito.*;
 
 import com.cognizant.taxease.dao.FilingDocumentRepository;
 import com.cognizant.taxease.dao.TaxFilingRepository;
+import com.cognizant.taxease.dao.UserRepository;
 import com.cognizant.taxease.dto.requestdto.FilingDocumentRequestDTO;
 import com.cognizant.taxease.dto.responsedto.FilingDocumentResponseDTO;
 import com.cognizant.taxease.entity.FilingDocument;
 import com.cognizant.taxease.entity.TaxFiling;
+import com.cognizant.taxease.entity.User;
+import com.cognizant.taxease.entity.entityEnum.UserRole;
 import com.cognizant.taxease.service.impl.FilingDocumentServiceImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +42,9 @@ public class FilingDocumentServiceTest {
 
     @Mock
     private AuditLogService auditLogService;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private FilingDocumentServiceImpl filingDocumentService;
@@ -94,6 +104,24 @@ public class FilingDocumentServiceTest {
     @Test
     void testGetDocumentsByFiling_Success() throws AccessDeniedException {
         // Arrange
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername("john@example.com")
+                .password("password")
+                .roles("ADMIN")
+                .build();
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        com.cognizant.taxease.entity.User user = new com.cognizant.taxease.entity.User();
+        user.setEmail("john@example.com");
+        user.setRole(UserRole.ADMINISTRATOR);
+
+        when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(user));
         when(documentRepository.findByFilingId(50L)).thenReturn(List.of(mockDocument));
 
         // Act
@@ -104,5 +132,10 @@ public class FilingDocumentServiceTest {
         assertEquals(1, result.size());
         assertEquals(50L, result.get(0).getFilingId());
         verify(auditLogService).record(eq("DOCUMENT_LIST_VIEW"), contains("50"));
+    }
+
+    @org.junit.jupiter.api.AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 }

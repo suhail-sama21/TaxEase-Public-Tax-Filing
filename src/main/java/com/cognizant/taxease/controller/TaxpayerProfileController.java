@@ -98,4 +98,16 @@ public class TaxpayerProfileController {
         log.info("END: Document ID: {} updated", documentId);
         return ResponseEntity.ok(updatedDocument);
     }
+
+    @PutMapping("/documents/{documentId}/verify")
+    @PreAuthorize("hasRole('OFFICER') or hasRole('ADMINISTRATOR')")
+    public ResponseEntity<TaxpayerDocumentResponseDto> verifyDocument(
+            @PathVariable Long documentId,
+            @Valid @RequestBody com.cognizant.taxease.dto.requestdto.DocumentVerificationRequestDto request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("START: Verifying document ID: {} for officer: {}", documentId, email);
+        TaxpayerDocumentResponseDto response = taxpayerProfileService.verifyDocumentStatus(email, documentId, request.getVerificationStatus());
+        log.info("END: Document ID: {} verification status set to {}", documentId, request.getVerificationStatus());
+        return ResponseEntity.ok(response);
+    }
 }
