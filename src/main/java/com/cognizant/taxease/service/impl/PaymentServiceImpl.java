@@ -3,6 +3,9 @@ package com.cognizant.taxease.service.impl;
 import com.cognizant.taxease.dao.PaymentRepository;
 import com.cognizant.taxease.dao.RevenueRecordRepository;
 import com.cognizant.taxease.dao.TaxFilingRepository;
+import com.cognizant.taxease.dto.responsedto.PaymentMetricsResponse;
+import com.cognizant.taxease.dto.responsedto.PaymentResponseDto;
+import com.cognizant.taxease.dto.responsedto.RevenueDashboardResponse;
 import com.cognizant.taxease.entity.Payment;
 import com.cognizant.taxease.entity.RevenueRecord;
 import com.cognizant.taxease.entity.TaxFiling;
@@ -13,8 +16,10 @@ import com.cognizant.taxease.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -33,8 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public Payment makePayment(Long filingId, PaymentMethod method, BigDecimal amount, StatusBasic status) {
-        // TAXFR-10: Make online tax payment using filing ID
+    public PaymentResponseDto makePayment(Long filingId, PaymentMethod method, BigDecimal amount, StatusBasic status) {
         TaxFiling filing = taxFilingRepository.findById(filingId)
                 .orElseThrow(() -> new RuntimeException("Filing not found"));
 
@@ -47,7 +51,6 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment = paymentRepository.save(payment);
 
-        // AUDI-4: Only create RevenueRecord if payment is Completed (Success)
         if (status == StatusBasic.Completed) {
             RevenueRecord revenueRecord = RevenueRecord.builder()
                     .taxpayer(filing.getTaxpayer())
@@ -55,22 +58,25 @@ public class PaymentServiceImpl implements PaymentService {
                     .amount(amount)
                     .status(StatusBasic.Completed)
                     .build();
+            revenueRecordRepository.save(revenueRecord);
+
             auditLogService.record("PAYMENT_CREATE", "payments/" + payment.getId());
         }
 
-        return payment;
+        return mapToDto(payment);
     }
 
     @Override
-    public List<Payment> getPaymentsByTaxpayer(Long taxpayerId) {
-        // TAXFR-11: View previous payments for logged-in user
-        return paymentRepository.findByFiling_Taxpayer_Id(taxpayerId);
+    public List<PaymentResponseDto> getPaymentsByTaxpayer(Long taxpayerId) {
+        List<Payment> payments = paymentRepository.findByFiling_Taxpayer_Id(taxpayerId);
+        return payments.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Payment retryPayment(Long oldPaymentId, PaymentMethod newMethod) {
-        // TAXFR-12: Retry a failed payment
+    public PaymentResponseDto retryPayment(Long oldPaymentId, PaymentMethod newMethod) {
         Payment oldPayment = paymentRepository.findById(oldPaymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
@@ -78,7 +84,6 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("Only failed payments can be retried");
         }
 
-        // Creates a new record for the retry; the old one remains Failed
         auditLogService.record("PAYMENT_RETRY", "payments/" + oldPaymentId);
         return makePayment(
                 oldPayment.getFiling().getId(),
@@ -86,5 +91,41 @@ public class PaymentServiceImpl implements PaymentService {
                 oldPayment.getAmount(),
                 StatusBasic.Completed // Assuming success for the retry
         );
+    }
+
+    @Override
+    public PaymentMetricsResponse getPaymentMetrics() {
+        long successful = paymentRepository.countByStatus(StatusBasic.Completed);
+        long failed = paymentRepository.countByStatus(StatusBasic.Failed);
+        long total = paymentRepository.count();
+
+        return PaymentMetricsResponse.builder()
+                .successfulTransactions(successful)
+                .failedTransactions(failed)
+                .totalTransactions(total)
+                .build();
+    }
+
+    @Override
+    public RevenueDashboardResponse getRevenueDashboard() {
+        BigDecimal collected = revenueRecordRepository.sumCollectedRevenue();
+        BigDecimal outstanding = paymentRepository.sumOutstandingPayments();
+
+        return RevenueDashboardResponse.builder()
+                .revenueCollected(collected != null ? collected : BigDecimal.ZERO)
+                .outstandingPayments(outstanding != null ? outstanding : BigDecimal.ZERO)
+                .build();
+    }
+
+    // Helper method to map Payment entity to PaymentResponseDto
+    private PaymentResponseDto mapToDto(Payment payment) {
+        return PaymentResponseDto.builder()
+                .id(payment.getId())
+                .filingId(payment.getFiling().getId())
+                .amount(payment.getAmount())
+                .method(payment.getMethod())
+                .status(payment.getStatus())
+                .date(payment.getDate())
+                .build();
     }
 }

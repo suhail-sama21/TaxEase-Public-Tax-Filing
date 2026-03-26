@@ -11,8 +11,11 @@ import com.cognizant.taxease.entity.TaxpayerDocument;
 import com.cognizant.taxease.entity.User;
 import com.cognizant.taxease.entity.entityEnum.DocTypeTaxpayer;
 import com.cognizant.taxease.entity.entityEnum.VerificationStatus;
+import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.TaxpayerProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
     private final UserRepository userRepository;
     private final TaxpayerRepository taxpayerRepository;
     private final TaxpayerDocumentRepository taxpayerDocumentRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     public TaxpayerProfileResponseDto getProfile(String email) {
@@ -57,7 +61,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
         taxpayer.setAddress(request.getAddress());
         taxpayer.setContactInfo(request.getContactInfo());
         taxpayerRepository.save(taxpayer);
-
+        auditLogService.record("TAXPAYER_PROFILE_UPDATE", "profile_update/" + taxpayer.getId());
         return getProfile(email); // Return updated profile
     }
 
@@ -101,6 +105,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
                 .build();
 
         TaxpayerDocument savedDocument = taxpayerDocumentRepository.save(document);
+        auditLogService.record("UPLOAD_DOCUMENT", "upload_document/" + taxpayer.getId());
         return convertToDto(savedDocument);
     }
 
@@ -125,6 +130,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
 
         // No file deletion needed since we're storing links, not files
         taxpayerDocumentRepository.delete(document);
+        auditLogService.record("DELETE_DOCUMENT", "delete_document/" + taxpayer.getId());
     }
 
     @Override
@@ -155,6 +161,7 @@ public class TaxpayerProfileServiceImpl implements TaxpayerProfileService {
         document.setVerificationStatus(VerificationStatus.Pending); // Reset to pending after update
 
         TaxpayerDocument updatedDocument = taxpayerDocumentRepository.save(document);
+        auditLogService.record("DOCUMENT_UPDATED", "document_updated/" + taxpayer.getId());
         return convertToDto(updatedDocument);
     }
 

@@ -10,12 +10,14 @@ import jakarta.validation.Valid; // Required for validation enforcement
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class AuthController {
 
     private final TaxpayerRegistrationService registrationService;

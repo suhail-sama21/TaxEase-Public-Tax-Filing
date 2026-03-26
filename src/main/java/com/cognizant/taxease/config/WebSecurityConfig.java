@@ -2,6 +2,7 @@ package com.cognizant.taxease.config;
 import com.cognizant.taxease.entity.entityEnum.UserRole;
 import com.cognizant.taxease.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,19 +14,29 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-
+    private final HandlerExceptionResolver resolver;
+    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter,
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.resolver = resolver;
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(csrfConfig -> csrfConfig.disable())
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            resolver.resolveException(request, response, null, accessDeniedException);
+                        })
+                    )
                 .authorizeHttpRequests(auth -> auth
                         // 1. Public Routes
                         .requestMatchers("/api/auth/**").permitAll()
@@ -43,7 +54,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/payments/history/**").hasAnyRole("TAXPAYER", "OFFICER")
 
                         // 4. Compliance & Audit
-                        .requestMatchers("/api/compliance/**").hasAnyRole("COMPLIANCE", "MANAGER", "ADMIN")
+                        .requestMatchers("/api/compliance/**").hasAnyRole("COMPLIANCE", "MANAGER", "ADMIN","TAXPAYER")
                         .requestMatchers("/api/compliance/taxpayer/**").hasAnyRole("TAXPAYER", "COMPLIANCE")
                         .requestMatchers("/api/audit/**").hasRole("AUDITOR")
 

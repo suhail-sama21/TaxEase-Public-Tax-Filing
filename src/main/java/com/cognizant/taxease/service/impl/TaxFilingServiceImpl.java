@@ -9,9 +9,13 @@ import com.cognizant.taxease.entity.entityEnum.StatusBasic;
 import com.cognizant.taxease.dao.TaxFilingRepository;
 import com.cognizant.taxease.dao.TaxpayerRepository;
 import com.cognizant.taxease.dao.UserRepository;
+import com.cognizant.taxease.entity.entityEnum.UserRole;
 import com.cognizant.taxease.service.AuditLogService;
 import com.cognizant.taxease.service.TaxFilingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +50,17 @@ public class TaxFilingServiceImpl implements TaxFilingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<TaxFilingResponseDTO> getFilingHistory(Long taxpayerId) {
+        UserDetails userDetails=(UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user=userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        if(user.getRole().equals(UserRole.TAXPAYER)) {
+            Taxpayer taxpayer = user.getTaxpayer();
+
+            if (!taxpayer.getId().equals(taxpayerId)) {
+                throw new AccessDeniedException("Access Denied");
+            }
+        }
         auditLogService.record("FILING_HISTORY_VIEW", "taxpayer/" + taxpayerId + "/filings");
         return taxFilingRepository.findByTaxpayerId(taxpayerId).stream()
                 .map(this::mapToDTO)
