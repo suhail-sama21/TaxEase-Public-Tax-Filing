@@ -10,14 +10,17 @@ import com.cognizant.taxease.service.ReportService;
 import com.cognizant.taxease.dto.responsedto.PaymentMetricsResponse;
 import com.cognizant.taxease.dto.responsedto.AuditDashboardResponse;
 import com.cognizant.taxease.dto.responsedto.RevenueDashboardResponse;
+import com.cognizant.taxease.dto.responsedto.AuditResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -66,28 +69,38 @@ public class ReportServiceImpl implements ReportService {
                 .build();
     }
 
+    // 🚀 Updated Method: Pagination & Entity to DTO Mapping
     @Override
-    public List<Audit> getCompletedAudits() {
-        return auditRepository.findByStatus(StatusBasic.Completed);
+    public Page<AuditResponse> getCompletedAudits(Pageable pageable) {
+        // Step 1: Database-la irunthu Page-a edukkurom
+        Page<Audit> auditPage = auditRepository.findByStatus(StatusBasic.Completed, pageable);
+
+        // Step 2: Un original entity-ku yetha mathiri correct-a map pandrom
+        return auditPage.map(audit -> AuditResponse.builder()
+                .id(audit.getId())
+                .officerId(audit.getOfficer() != null ? audit.getOfficer().getId() : null)
+                .scope(audit.getScope())
+                .findings(audit.getFindings())
+                .createdAt(audit.getCreatedAt())
+                .status(audit.getStatus())
+                .build()
+        );
     }
 
     @Override
     public byte[] generateCustomReport(LocalDate startDate, LocalDate endDate, String reportType, List<String> metrics) {
         StringBuilder csv = new StringBuilder();
 
-        // 1. Build the Report Header
         csv.append("TaxEase Dynamic Custom Report\n");
         csv.append("Report Type:,").append(reportType).append("\n");
         csv.append("Date Range:,").append(startDate).append(",to,").append(endDate).append("\n\n");
 
-        // Convert LocalDate to Instant for tables that use Instant for timestamps (like RevenueRecord)
         Instant startInstant = startDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
         Instant endInstant = endDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant();
 
-        // 2. Fetch and append Revenue Data if requested
         if (metrics.contains("Revenue")) {
             csv.append("--- REVENUE DATA ---\n");
-            csv.append("Revenue ID,Taxpayer ID,Amount,Date,Status\n"); // Column Headers
+            csv.append("Revenue ID,Taxpayer ID,Amount,Date,Status\n");
 
             List<RevenueRecord> revenues = revenueRepository.findByDateBetween(startInstant, endInstant);
 
@@ -105,10 +118,9 @@ public class ReportServiceImpl implements ReportService {
             csv.append("\n");
         }
 
-        // 3. Fetch and append Compliance Data if requested
         if (metrics.contains("Compliance")) {
             csv.append("--- COMPLIANCE DATA ---\n");
-            csv.append("Compliance ID,Taxpayer ID,Type,Result,Date,Notes\n"); // Column Headers
+            csv.append("Compliance ID,Taxpayer ID,Type,Result,Date,Notes\n");
 
             List<ComplianceRecord> compliances = complianceRepository.findByDateBetween(startDate, endDate);
 
@@ -116,9 +128,7 @@ public class ReportServiceImpl implements ReportService {
                 csv.append("No compliance records found for this period.\n");
             } else {
                 for (ComplianceRecord c : compliances) {
-                    // We replace commas in the notes with spaces so they don't break the CSV columns!
                     String safeNotes = c.getNotes() != null ? c.getNotes().replace(",", " ") : "N/A";
-
                     csv.append(c.getId()).append(",")
                             .append(c.getTaxpayer().getId()).append(",")
                             .append(c.getType()).append(",")

@@ -13,6 +13,5 @@ public interface RevenueRecordRepository extends JpaRepository<RevenueRecord, Lo
     @Query("SELECT SUM(r.amount) FROM RevenueRecord r WHERE r.status = 'Completed'")
     BigDecimal sumCollectedRevenue();
 
-    // NEW: Fetch revenue records between two dates
     List<RevenueRecord> findByDateBetween(Instant startDate, Instant endDate);
 }
