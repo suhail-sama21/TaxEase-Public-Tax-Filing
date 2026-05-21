@@ -13,7 +13,6 @@ import java.util.*;
 @Table(name = "taxpayer")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Taxpayer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "taxpayer_id")
@@ -26,6 +25,9 @@ public class Taxpayer {
 
     @Column(name = "name", nullable = false, length = 200)
     private String name;
+
+    @Column(name = "taxpayer_id_number", nullable = false, unique = true, length = 11)
+    private String taxpayerIdNumber; // 11-digit unique ID
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 30)

@@ -10,7 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "user",
+@Table(name = "`user`",
         indexes = {
                 @Index(name = "idx_user_email", columnList = "email", unique = true),
                 @Index(name = "idx_user_role_status", columnList = "role,status")
